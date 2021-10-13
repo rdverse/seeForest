@@ -1,0 +1,25 @@
+
+ #grid{
+    width: 45%;
+    height: 75%;
+    float:left; /* add this */
+    border: 2px solid#e08a46;
+  }
+
+  
+  #explanation{
+    width: 50%;
+    height: 75%;
+    float:right; /* add this */
+    border: 2px solid#e08a46;
+  }
+
+  #resetButton{
+    position : fixed    }
+  
+
+  body {
+      margin: 10px;
+      overflow: hidden;
+      background-color: rgb(247, 237, 223);
+  }
