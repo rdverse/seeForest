@@ -84,4 +84,26 @@ var canvas  = d3.select("#forest")
 	node.append("rect")
 		.attr("width", 20)
 		.attr("height", 20)
-		.attr("fill", "black");
+		.attr("opacity", 0.8)
+		.attr("fill", "blue").on("pointerover", function(p,d){
+			console.log(d);
+		});
+
+	// 	var node1 = canvas.selectAll(".node1")
+	// .data(nodes)
+	// .enter()
+	// .append("g")
+	// .attr("class", "node")
+	// .attr("transform", function (d){
+	// 	console.log(d.x);
+	// 	xc=d.x+100;
+	// 	return "translate(" + xc + "," + d.y + ")";
+	// });
+
+	// node1.append("rect")
+	// 	.attr("width", 20)
+	// 	.attr("height", 20)
+	// 	.attr("opacity", 0.3)
+	// 	.attr("fill", "blue").on("pointerover", function(p,d){
+	// 		console.log(d);
+	// 	});
