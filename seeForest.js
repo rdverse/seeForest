@@ -1,4 +1,5 @@
-
+// import { jsonData } from "./data";
+//import {jsonData} from 'data.js';
 /////////////////////////////////////////////////////////////////////
 /////////////////////////global variables/////////////////////////////
 ////////////////////////////////////////////////////////////////////
@@ -55,24 +56,6 @@ function plot_node(da,k, svg,rw,rh){
 	}
 
 
-const jsonData = {
-    "name" : "Max",
-    "children" : [
-        {
-        "name": "Sylvia",
-        "children":[
-                {"name":"Craig"},
-                {"name":"Robin"},
-            ]
-        },
-        {
-        "name": "David",
-        "children":[
-                {"name":"Jeff"},
-                {"name":"Buffy"}            ]
-        }
-    ]
-};    
     
 var canvas  = d3.select("#forest")
 .append("svg")
@@ -158,7 +141,8 @@ var i = 0,
 	 .attr('width', 20)
 	 .attr('height', 20)
 	 .attr('opacity', 0.8)
-	 .attr("fill", "blue");
+	 .attr("fill", "none")
+	 .style("stroke", "black");
 
 	 // ******** All about the links ******
 
@@ -185,72 +169,3 @@ var i = 0,
 	console.log(link);
 	var linkUpdate = linkEnter.merge(link)
 	.attr('d', function(d){ return diagonal(d, d.parent) });
-
-
-
-
-	// var nodes = d3.hierarchy(jsonData, function(d) {
-	// 	return d.children;
-	// 	});
-
-	// nodes = treeMap(nodes);
-	
-	// //var links = nodes.descendants().slice(1);
-	// var links = treeMap.links(nodes);
-	// console.log(links);
-
-	// //console.log(links);
-	// console.log(nodes);
-
-	// var node = canvas.selectAll(".node")
-	// .data(nodes)
-	// .enter()
-	// .append("g")
-	// .attr("class", "node")
-	// .attr("transform", function (d){
-	// 	console.log(d.x);
-	// 	xc=d.x+100;
-	// 	return "translate(" + xc + "," + d.y + ")";
-	// });
-
-	// node.append("rect")
-	// 	.attr("width", 20)
-	// 	.attr("height", 20)
-	// 	.attr("opacity", 0.8)
-	// 	.attr("fill", "blue").on("pointerover", function(p,d){
-	// 		console.log(d);
-	// 	});
-	
-	// 	var diagonal = d3.linkHorizontal()
-	// 						.x(function(d){return d.x})
-	// 						.y(function(d){return d.y});
-
-	// var lines = canvas.selectAll(".lines")
-	// .data(links)
-	// .enter()
-	// .append("g")
-	// .attr("class" , "lines");
-
-	// lines.append("path")
-	// .attr("fill", "none")
-	// .attr("stroke", "black")
-	// .attr("d", diagonal);
-
-	// 	var node1 = canvas.selectAll(".node1")
-	// .data(nodes)
-	// .enter()
-	// .append("g")
-	// .attr("class", "node")
-	// .attr("transform", function (d){
-	// 	console.log(d.x);
-	// 	xc=d.x+100;
-	// 	return "translate(" + xc + "," + d.y + ")";
-	// });
-
-	// node1.append("rect")
-	// 	.attr("width", 20)
-	// 	.attr("height", 20)
-	// 	.attr("opacity", 0.3)
-	// 	.attr("fill", "blue").on("pointerover", function(p,d){
-	// 		console.log(d);
-	// 	});
