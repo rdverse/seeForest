@@ -2,6 +2,29 @@
 /////////////////////////////////////////////////////////////////////
 /////////////////////////global variables/////////////////////////////
 ////////////////////////////////////////////////////////////////////
+function diagonal(s, d) {
+
+//	s.y = s.y+20;
+	//d.x=d.x+20;
+	//d.x = d.x-10;
+    //d.x = d.x+10
+	//s.x = s.x+10
+	// path = `M ${s.y} ${s.x+10}
+    //         C ${(s.y + d.y) / 2} ${s.x+10},
+    //           ${(s.y + d.y) / 2} ${d.x+10},
+    //           ${d.y} ${d.x+10}`
+
+	path = `M ${s.y}, ${s.x+10}
+			C ${(s.y + d.y) / 2} ${s.x+10},
+            ${(s.y + d.y) / 2} ${d.x+10},
+			${d.y+20} , ${d.x+10}`
+
+
+	console.log("path");
+	console.log(path);
+    return path
+  }
+
 
 function plot_node(da,k, svg,rw,rh){
 	// var width = 1200,
@@ -69,6 +92,7 @@ var i = 0,
 	console.log(treeMap);
 	root.x0 = 500/2;
 	root.y0 = 0;
+
 	console.log(root);
 
 	//get x and y coordinates for nodes
@@ -134,9 +158,36 @@ var i = 0,
 	 .attr('width', 20)
 	 .attr('height', 20)
 	 .attr('opacity', 0.8)
-	 .attr("fill", "blue").on("pointerover", function(p,d){
-				 console.log(d);
-		 });;
+	 .attr("fill", "blue");
+
+	 // ******** All about the links ******
+
+	 var link = canvas.selectAll('path.link')
+	 				.data(links, function(d){return d.id;});
+
+	var linkEnter = link.enter()
+						.insert('path', "g")
+						.attr("class", "link")
+						.attr("stroke", "red")
+						.attr("fill", "none")
+						.attr("stroke-width", "0.5px")
+						.attr('d', function(d){
+							var o = {x: root.x0, y: root.y0};
+							return diagonal(o,o);
+						});
+
+					//  .attr("d", function(d){
+					// 	 var o = {x : d.source.x0, y: d.source.y0};
+					// 	 return diagonal(o,o);
+					//  });
+
+	console.log("link generated");
+	console.log(link);
+	var linkUpdate = linkEnter.merge(link)
+	.attr('d', function(d){ return diagonal(d, d.parent) });
+
+
+
 
 	// var nodes = d3.hierarchy(jsonData, function(d) {
 	// 	return d.children;
