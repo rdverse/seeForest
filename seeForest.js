@@ -7,13 +7,14 @@ var margin = {top:30, right:60, left:60, bottom:30 },
 			width = wdim - margin.right - margin.left,
 			height = hdim - margin.top - margin.bottom;
 var canvas;
+var squareDim = 20;
 var ss;
 /////////////////////////////////////////////////////////////////
 /////////////////////Function to draw lines for each link///////
 ///////////////////////////////////////////////////////////////
 function diagonal(s, d) {
-//	s.y = s.y+20;
-	//d.x=d.x+20;
+//	s.y = s.y+squareDim;
+	//d.x=d.x+squareDim;
 	//d.x = d.x-10;
     //d.x = d.x+10
 	//s.x = s.x+10
@@ -29,26 +30,23 @@ function diagonal(s, d) {
 // 	console.log(s.data["val"]);
 // }
 var xmul;
-if("data" in s){
-	console.log(d);
-}
 	try{
 		console.log("try");
-		xmul = 20*s.data["val"];
+		xmul = squareDim*s.data["val"] + squareDim*(s.data["feat"]);
 	}
 	catch{
 		console.log("catch");
-		xmul = 20;
+		xmul = squareDim;
 	}
 
 if(Number.isNaN(xmul)){
-	xmul = 20;
+	xmul = squareDim+ squareDim*(s.data["feat"]-1);
 }
-console.log(xmul);
+
 	path = `M ${s.y}, ${s.x+xmul}
 			C ${(s.y + d.y) / 2} ${s.x+xmul},
             ${(s.y + d.y) / 2} ${d.x+xmul},
-			${d.y+20} , ${d.x+xmul}`
+			${d.y+squareDim} , ${d.x+xmul}`
 
     return path
   }
@@ -66,7 +64,9 @@ function build_canvas(){
 	return svg;
 }  
 
-
+/////////////////////////////////////////////////////////////////
+/////////////////////Water nodes and links//////////////////////
+///////////////////////////////////////////////////////////////
 function Initialize_tree(jsonData){
 // Initialize treemap layout with a size
 
@@ -75,6 +75,8 @@ var root = d3.hierarchy(jsonData, function(d){return d.children;});
 // Set the start point of root node
 root.x0 = height/2;
 root.y0 = 0;
+console.log("root");
+console.log(root);
 
 //get x and y coordinates for nodes
 var treeData = treeMap(root);
@@ -85,32 +87,15 @@ var nodes = treeData.descendants(),
 links = treeData.descendants().slice(1);
 
 //normalize depth
-nodes.forEach(d => {d.y = d.depth = d.depth*150});
+nodes.forEach(d => {d.x = d.x - 100;d.y = d.depth*150;});
 
 return [root, nodes, links];
 }
 
-function draw_nodes(root, nodes){
-	var i = 0;
-	var node = canvas.selectAll(".node")
-				.data(nodes, function(d){return d.id ||(d.id = ++i);});
-			//	console.log("node");
-
-	// console.log(node);
-	var nodeEnter = node.enter()
-					.append('g')
-					.attr('class', 'node')
-					.attr('transform', function (d){return 'translate(' + root.y0 + ',' + root.x0 + ')';});
-
-	nodeEnter.append("rect")
-			.attr('class', 'node')
-			.attr('width', 20)
-			.attr('height', 20)
-			.attr('opacity', 0.8)
-			.attr("fill", "blue").on("pointerover", function(p,d){
-						//console.log(d);
-				});
-
+/////////////////////////////////////////////////////////////////
+/////////////////////tooltip for node//////////////////////
+///////////////////////////////////////////////////////////////
+function add_text(nodeEnter){
 	nodeEnter.append('text')
 	.attr('dy', '.35em')
 	.attr('x', function(d){return d.children || d._children ? 33 : 53;})
@@ -124,27 +109,52 @@ function draw_nodes(root, nodes){
 		return d.children || d._children ? 'start' : 'end'
 	})
 	.text(function(d) {return d.data.name;});
+return nodeEnter;
+}
 
+function draw_nodes(root,treeIndex, nodes){
+	var i = 0;
+	var node = canvas.selectAll(".node" + String(treeIndex))
+				.data(nodes, function(d){return d.id ||(d.id = ++i);});
+			//	console.log("node");
+
+	// console.log(node);
+	var nodeEnter = node.enter()
+					.append('g')
+					.attr('class', 'node')
+					.attr('transform', function (d){return 'translate(' + root.y0 + ',' + root.x0 + ')';});
+
+	nodeEnter.append("rect")
+			.attr('class', 'node')
+			.attr('width', squareDim)
+			.attr('height', squareDim)
+			.attr('opacity', 0.8)
+			.attr("fill", "blue")
+			.on("pointerover", function(p,d){
+						//console.log(d);
+				});
+
+	nodeEnter = add_text(nodeEnter);
 
 	var nodeUpdate = nodeEnter.merge(node);
 
 	nodeUpdate.transition()
 	.duration(750)
 	.attr("transform", function(d) { 
-		return "translate(" + d.y + "," + d.x + ")";
+		return "translate(" + d.y + "," + (d.x+d.data.feat*squareDim) + ")";
 	});
 
 	nodeUpdate.select('rect.node')
-	.attr('width', 20)
-	.attr('height', 20)
-	.attr('opacity', 0.8)
-	.attr("fill", "none")
+	.attr('width', squareDim)
+	.attr('height', squareDim)
+	.attr('opacity', 0.2)
+	.attr("fill", "blue")
 	.style("stroke", "black");
 
 }
 
-function draw_links(root, links){
-	var link = canvas.selectAll('path.link')
+function draw_links(root,treeIndex, links){
+	var link = canvas.selectAll('path.link' + String(treeIndex))
 					.data(links, function(d){return d.id;});
 
 	var linkEnter = link.enter()
@@ -171,24 +181,26 @@ function draw_links(root, links){
 
 }
 
-function draw_tree(jsonData){
+function draw_tree(jsonData,treeIndex){
 	// *********get initializations*******************
 	var [root, nodes, links] = Initialize_tree(jsonData);
 
 	// ********nodes section ************
-	draw_nodes(root, nodes);
+	draw_nodes(root,treeIndex, nodes);
 
 	// ******** All about the links ******
-	draw_links(root, links);
+	draw_links(root,treeIndex, links);
 }
 	
 ////////////////////////////////////////////////////////////////////
 /////////////////////// MAIN //////////////////////////////////////
 //////////////////////////////////////////////////////////////////
-
 function main(){
+
+	// Radial tree seems to be a cool idea
 	canvas = build_canvas();
-	draw_tree(jsonData);
+	//draw_tree(jsonList[0]);
+	jsonList.forEach(function(d, i){draw_tree(d, i);});
 }
 
 main();
