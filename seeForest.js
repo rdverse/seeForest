@@ -3,7 +3,7 @@
 ////////////////////////////////////////////////////////////////////
 var margin = {top:30, right:60, left:60, bottom:30 },
   			wdim = 960,
-			hdim =  600,
+			hdim =  1200,
 			width = wdim - margin.right - margin.left,
 			height = hdim - margin.top - margin.bottom;
 var canvas;
@@ -12,7 +12,7 @@ var ss;
 /////////////////////////////////////////////////////////////////
 /////////////////////Function to draw lines for each link///////
 ///////////////////////////////////////////////////////////////
-function diagonal(s, d) {
+function diagonal(s, d,i) {
 //	s.y = s.y+squareDim;
 	//d.x=d.x+squareDim;
 	//d.x = d.x-10;
@@ -29,6 +29,9 @@ function diagonal(s, d) {
 // 	console.log(s.data[key]);
 // 	console.log(s.data["val"]);
 // }
+console.log(i);
+console.log(s);
+console.log("parent: " + d["data"]["name"] + "   child :" +  s["data"]["name"] )
 var xmul;
 	try{
 		console.log("try");
@@ -61,6 +64,10 @@ function build_canvas(){
 	.attr("height", hdim)
 	.append("g")
 	.attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+	
+
+	
+	
 	return svg;
 }  
 
@@ -154,6 +161,8 @@ function draw_nodes(root,treeIndex, nodes){
 }
 
 function draw_links(root,treeIndex, links){
+	console.log("links")
+	console.log(links)
 	var link = canvas.selectAll('path.link' + String(treeIndex))
 					.data(links, function(d){return d.id;});
 
@@ -177,7 +186,7 @@ function draw_links(root,treeIndex, links){
 	//console.log("link generated");
 	//console.log(link);
 	var linkUpdate = linkEnter.merge(link)
-					.attr('d', function(d){ return diagonal(d, d.parent)});
+					.attr('d', function(d,i){ return diagonal(d, d.parent,i)});
 
 }
 
@@ -199,8 +208,40 @@ function main(){
 
 	// Radial tree seems to be a cool idea
 	canvas = build_canvas();
-	//draw_tree(jsonList[0]);
-	jsonList.forEach(function(d, i){draw_tree(d, i);});
+	draw_tree(jsonSK2);//draw_tree(jsonSK);	
+		
+	// var zoom = d3.zoom()
+    //   .scaleExtent([1, 8])
+    //   	.on('zoom', function(event) {
+    //       canvas.selectAll('')
+    //        .attr('transform', event.transform);
+	// 	});
+
+	// canvas.call(zoom);
+
+	function zoomed({transform}) {
+		canvas.attr("transform", transform);
+	  }
+	  
+	canvas.call(d3.zoom()
+	.extent([[0, 0], [width, height]])
+	.scaleExtent([0, 2])
+	.on("zoom", zoomed));
+
+	var fisheye = d3.fisheye.circular()
+    .radius(200)
+    .distortion(2);
+	var fisheye = d3.fisheye();
+	// canvas.on("mousemove", function() {
+	// 	fisheye.focus(d3.mouse(this));
+	//   });
+	canvas.on("pointerover", function() {
+		fisheye.center(d3.mouse(this));
+		path.attr("d", function(d) { return line(d.map(fisheye)); });
+	  });
+	  
+
+	//jsonList.forEach(function(d, i){draw_tree(d, i);});
 }
 
 main();
