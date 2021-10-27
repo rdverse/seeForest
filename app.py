@@ -91,8 +91,8 @@ js = export_dict(clf,feature_names= data.feature_names)
 pprint.pprint(js)
 
 
-# plot_tree(clf, feature_names = data.feature_names, ax = ax)
-# plt.show()
+plot_tree(clf, filled=True,feature_names = data.feature_names, ax = ax)
+plt.show()
 # clf = DecisionTreeClassifier()
 # iris = load_iris()
 # clf = clf.fit(iris.data, iris.target)

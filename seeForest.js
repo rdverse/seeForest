@@ -58,24 +58,25 @@ if(Number.isNaN(xmul)){
   }
   
 
-  function diagonals(s, d,i,ruleIndex) {
-
-	console.log(s.data.name);
-	console.log(d.data.name);
+  function diagonals(s, d,dataSlice) {
 	
 	var childName = s.data.name;
 	var parentName = d.data.name;
+
 	if(childName=="leaf"){
 	childName = parentName;	
 	}
 
 	var xmul;
-	console.log(jsonData[childName][ruleIndex]);
-	xmul = squareDim*jsonData[childName][ruleIndex] + squareDim*(s.data["feat"]);
+
+//	console.log(jsonData[childName][ruleIndex]);
+
+	xmul = squareDim* dataSlice[childName] + squareDim*2;
+
 	console.log(xmul);
 	
 	if(Number.isNaN(xmul)){
-		xmul = squareDim+ squareDim*(s.data["feat"]-1);
+		xmul = squareDim+ squareDim*1;
 	}
 	
 		path = `M ${s.y}, ${s.x+xmul}
@@ -96,10 +97,6 @@ function build_canvas(){
 	.attr("height", hdim)
 	.append("g")
 	.attr("transform", "translate(" + margin.left + "," + margin.top + ")");
-	
-
-	
-	
 	return svg;
 }  
 
@@ -193,42 +190,60 @@ function draw_nodes(root,treeIndex, nodes){
 }
 
 function draw_links(root,treeIndex, links){
-	console.log("links")
-	console.log(links)
 
-	var link = canvas.selectAll('path.link' + String(treeIndex))
+	
+	// console.log("links")
+	// console.log(links["0"]);
+
+	// console.log("data slice");
+	// console.log((jsonData)=> {return jsonData});
+	
+
+	colors = {0:"red", 1: "blue", 2:"green"}
+
+	for(var i = 0; i<150;i++){	
+
+		var dataSlice = {};
+	
+		for(key in jsonData){
+			dataSlice[key] = jsonData[key][i];
+		};
+
+		console.log(i);
+		var link = canvas.selectAll('path.link' + String(treeIndex) + "_" + String(i))
 					.data(links, function(d){return d.id;});
+		
+		var linkEnter = link.enter()
+					.insert('path', "g")
+					.attr("class", "link")
+					.attr("stroke", colors[dataTarget[i]])
+					.attr("fill", "none")
+					.attr("opacity", 0.3)
+					.attr("stroke-width", "0.5px");
 
-	var linkEnter = link.enter()
-						.insert('path', "g")
-						.attr("class", "link")
-						.attr("stroke", "red")
-						.attr("fill", "none")
-						.attr("stroke-width", "0.5px");
+		var linkUpdate = linkEnter.merge(link);
 
-						// .attr('d', function(d){
-						// 	var o = {x: root.x0, y: root.y0};
-						// 	return diagonal(o,o);
-						// })
+		linkUpdate.attr('d', function(d,rule){ return (console.log(ruleData[rule][i], rule))});
 
-					//  .attr("d", function(d){
-					// 	 var o = {x : d.source.x0, y: d.source.y0};
-					// 	 return diagonal(o,o);
-					//  });
-	//console.log("link generated");
-	//console.log(link);
-	var linkUpdate = linkEnter.merge(link);
-	var count = 0;
-	console.log(ruleData); 	
-	for(rule in ruleData["3"]){
-		//console.log(ruleData["0"][rule]);
-		// console.log(rule);
+		// linkUpdate.attr('d', function(d,rule){ return (ruleData[rule][i]==1)?console.log("some"):console.log("none");});
+		linkUpdate.attr('d', function(d,rule){ return (ruleData[String(rule)][i]==1)?diagonals(d, d.parent,dataSlice):null;});
+	};
+	// var count = 0;
+	// // console.log(ruleData); 	
+	// 	//console.log(ruleData["0"][rule]);
+	// 	// console.log(rule);
 
-		if(ruleData["3"][rule]==1){
-			linkUpdate.attr('d', function(d,i){return diagonals(d, d.parent,i, count)});
-		}
-		count+=1;
-	}
+	// 	if(ruleData["3"][rule]==1){
+	// 	}
+	// 	count+=1;
+	
+// for each data point
+	// rule 0 
+	// rule 1
+	// rule 2
+	// rule 3
+	// .. 
+	// ..
 }
 
 function draw_tree(jsonData,treeIndex){
