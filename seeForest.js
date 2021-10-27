@@ -29,9 +29,12 @@ function diagonal(s, d,i) {
 // 	console.log(s.data[key]);
 // 	console.log(s.data["val"]);
 // }
-console.log(i);
-console.log(s);
-console.log("parent: " + d["data"]["name"] + "   child :" +  s["data"]["name"] )
+//console.log(ruleData[i]);
+
+//console.log("parent: " + d["data"]["name"] + "   child :" +  s["data"]["name"] )
+for(rule in ruleData[i]){
+
+}
 var xmul;
 	try{
 		console.log("try");
@@ -53,7 +56,36 @@ if(Number.isNaN(xmul)){
 
     return path
   }
+  
 
+  function diagonals(s, d,i,ruleIndex) {
+
+	console.log(s.data.name);
+	console.log(d.data.name);
+	
+	var childName = s.data.name;
+	var parentName = d.data.name;
+	if(childName=="leaf"){
+	childName = parentName;	
+	}
+
+	var xmul;
+	console.log(jsonData[childName][ruleIndex]);
+	xmul = squareDim*jsonData[childName][ruleIndex] + squareDim*(s.data["feat"]);
+	console.log(xmul);
+	
+	if(Number.isNaN(xmul)){
+		xmul = squareDim+ squareDim*(s.data["feat"]-1);
+	}
+	
+		path = `M ${s.y}, ${s.x+xmul}
+				C ${(s.y + d.y) / 2} ${s.x+xmul},
+				${(s.y + d.y) / 2} ${d.x+xmul},
+				${d.y+squareDim} , ${d.x+xmul}`
+	
+		return path
+	  }
+	
 /////////////////////////////////////////////////////////////////
 /////////////////////Function to build svg//////////////////////
 ///////////////////////////////////////////////////////////////
@@ -163,6 +195,7 @@ function draw_nodes(root,treeIndex, nodes){
 function draw_links(root,treeIndex, links){
 	console.log("links")
 	console.log(links)
+
 	var link = canvas.selectAll('path.link' + String(treeIndex))
 					.data(links, function(d){return d.id;});
 
@@ -182,12 +215,20 @@ function draw_links(root,treeIndex, links){
 					// 	 var o = {x : d.source.x0, y: d.source.y0};
 					// 	 return diagonal(o,o);
 					//  });
-
 	//console.log("link generated");
 	//console.log(link);
-	var linkUpdate = linkEnter.merge(link)
-					.attr('d', function(d,i){ return diagonal(d, d.parent,i)});
+	var linkUpdate = linkEnter.merge(link);
+	var count = 0;
+	console.log(ruleData); 	
+	for(rule in ruleData["3"]){
+		//console.log(ruleData["0"][rule]);
+		// console.log(rule);
 
+		if(ruleData["3"][rule]==1){
+			linkUpdate.attr('d', function(d,i){return diagonals(d, d.parent,i, count)});
+		}
+		count+=1;
+	}
 }
 
 function draw_tree(jsonData,treeIndex){
@@ -219,26 +260,26 @@ function main(){
 
 	// canvas.call(zoom);
 
-	function zoomed({transform}) {
-		canvas.attr("transform", transform);
-	  }
+	// function zoomed({transform}) {
+	// 	canvas.attr("transform", transform);
+	//   }
 	  
-	canvas.call(d3.zoom()
-	.extent([[0, 0], [width, height]])
-	.scaleExtent([0, 2])
-	.on("zoom", zoomed));
+	// canvas.call(d3.zoom()
+	// .extent([[0, 0], [width, height]])
+	// .scaleExtent([0, 2])
+	// .on("zoom", zoomed));
 
-	var fisheye = d3.fisheye.circular()
-    .radius(200)
-    .distortion(2);
-	var fisheye = d3.fisheye();
-	// canvas.on("mousemove", function() {
-	// 	fisheye.focus(d3.mouse(this));
+	// var fisheye = d3.fisheye.circular()
+    // .radius(200)
+    // .distortion(2);
+	// var fisheye = d3.fisheye();
+	// // canvas.on("mousemove", function() {
+	// // 	fisheye.focus(d3.mouse(this));
+	// //   });
+	// canvas.on("pointerover", function() {
+	// 	fisheye.center(d3.mouse(this));
+	// 	path.attr("d", function(d) { return line(d.map(fisheye)); });
 	//   });
-	canvas.on("pointerover", function() {
-		fisheye.center(d3.mouse(this));
-		path.attr("d", function(d) { return line(d.map(fisheye)); });
-	  });
 	  
 
 	//jsonList.forEach(function(d, i){draw_tree(d, i);});

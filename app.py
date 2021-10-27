@@ -9,13 +9,14 @@
 # if __name__=='__main__':
 #     app.run()
 
-import sklearn_json as skljson
+# import sklearn_json as skljson
 from sklearn.datasets import load_iris
 from sklearn.tree import DecisionTreeClassifier, export_text
 import tempfile
 import matplotlib.pyplot as plt
 import numpy as np
 import pprint
+from sklearn.preprocessing import MinMaxScaler
 
 
 from sklearn.datasets import load_iris
@@ -81,7 +82,8 @@ data = load_iris()
 clf = DecisionTreeClassifier(max_depth=3)
 clf.fit(data.data, data.target)
 node = {}
-
+scale = MinMaxScaler()
+d = scale.fit_transform(data.data)
 # r = rules(clf, data.feature_names, data.target_names)
 # plt.show()
 js = export_dict(clf,feature_names= data.feature_names)
@@ -107,7 +109,7 @@ for i in range(1,9):
 
 dataJson = {}
 for i,name in enumerate(data.feature_names):
-    dataJson[str(name)] = list(data.data[:,i].flatten())
+    dataJson[str(name)] = list(d[:,i].flatten())
 
 import json
 print(ruleJson)
