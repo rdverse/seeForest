@@ -1,11 +1,20 @@
-
 /////////////////////////////////////////////////////////////////////
 /////////////////////////global variables/////////////////////////////
 ////////////////////////////////////////////////////////////////////
-function diagonal(s, d) {
-
-//	s.y = s.y+20;
-	//d.x=d.x+20;
+var margin = {top:30, right:60, left:60, bottom:30 },
+  			wdim = 960,
+			hdim =  1200,
+			width = wdim - margin.right - margin.left,
+			height = hdim - margin.top - margin.bottom;
+var canvas;
+var squareDim = 20;
+var ss;
+/////////////////////////////////////////////////////////////////
+/////////////////////Function to draw lines for each link///////
+///////////////////////////////////////////////////////////////
+function diagonal(s, d,i) {
+//	s.y = s.y+squareDim;
+	//d.x=d.x+squareDim;
 	//d.x = d.x-10;
     //d.x = d.x+10
 	//s.x = s.x+10
@@ -13,124 +22,87 @@ function diagonal(s, d) {
     //         C ${(s.y + d.y) / 2} ${s.x+10},
     //           ${(s.y + d.y) / 2} ${d.x+10},
     //           ${d.y} ${d.x+10}`
+	// console.log("s");
+	// console.log(ss);
 
-	path = `M ${s.y}, ${s.x+10}
-			C ${(s.y + d.y) / 2} ${s.x+10},
-            ${(s.y + d.y) / 2} ${d.x+10},
-			${d.y+20} , ${d.x+10}`
+// 	for(var key in s.data){
+// 	console.log(s.data[key]);
+// 	console.log(s.data["val"]);
+// }
+console.log(i);
+console.log(s);
+console.log("parent: " + d["data"]["name"] + "   child :" +  s["data"]["name"] )
+var xmul;
+	try{
+		console.log("try");
+		xmul = squareDim*s.data["val"] + squareDim*(s.data["feat"]);
+	}
+	catch{
+		console.log("catch");
+		xmul = squareDim;
+	}
 
+if(Number.isNaN(xmul)){
+	xmul = squareDim+ squareDim*(s.data["feat"]-1);
+}
 
-	console.log("path");
-	console.log(path);
+	path = `M ${s.y}, ${s.x+xmul}
+			C ${(s.y + d.y) / 2} ${s.x+xmul},
+            ${(s.y + d.y) / 2} ${d.x+xmul},
+			${d.y+squareDim} , ${d.x+xmul}`
+
     return path
   }
 
-
-function plot_node(da,k, svg,rw,rh){
-	// var width = 1200,
-    // height = 1200,
-    // div = d3.select('#forest'),
-    // svg = div.append('svg')
-    //     .attr('width', width)
-    //     .attr('height', height),
-    // rw = 95,
-    // rh = 95;
-	console.log(da);
-	var grp = svg.selectAll('g')
-	.data(da)
-		.enter()
-		.append('g')
-		.attr('transform', function(d, i) {
-			return 'translate(0, ' + (rh + 5) * i*3 + ')';
-		});
-		
-		grp.selectAll('rect' + String(k))
-			.data(function(d) { return d; })
-			.enter()
-			.append('rect')
-			.attr('x', function(d, i) { return (rw + 5) * i; })
-			.attr('width', rw-20*k)
-			.attr('height', rh-20*k)    
-			.style("opacity", 0.1+k*0.3);
-	}
-
-
-const jsonData = {
-    "name" : "Max",
-    "children" : [
-        {
-        "name": "Sylvia",
-        "children":[
-                {"name":"Craig"},
-                {"name":"Robin"},
-            ]
-        },
-        {
-        "name": "David",
-        "children":[
-                {"name":"Jeff"},
-                {"name":"Buffy"}            ]
-        }
-    ]
-};    
-    
-var canvas  = d3.select("#forest")
-.append("svg")
-.attr("width", 500)
-.attr("height", 500)
-.append("g")
-.attr("transform", "translate(25,25)");
-
-var i = 0,
-    duration = 750,
-    root;
-
-	var treeMap = d3.tree().size([400,400]);
-	root = d3.hierarchy(jsonData, function(d){return d.children;});
+/////////////////////////////////////////////////////////////////
+/////////////////////Function to build svg//////////////////////
+///////////////////////////////////////////////////////////////
+function build_canvas(){
+	var svg  = d3.select("#forest")
+	.append("svg")
+	.attr("width", wdim)
+	.attr("height", hdim)
+	.append("g")
+	.attr("transform", "translate(" + margin.left + "," + margin.top + ")");
 	
-	console.log(root);
-	console.log(treeMap);
-	root.x0 = 500/2;
-	root.y0 = 0;
 
-	console.log(root);
-
-	//get x and y coordinates for nodes
-	var treeData = treeMap(root);
-
-	// Converts tree structured data into array format for nodes and links
-	var nodes = treeData.descendants(),
-	// slice to remove root node as there are no connections
-	links = treeData.descendants().slice(1);
-
-	console.log("nodes");
-	console.log(nodes);
-	console.log(links);
-
-	//normalize depth
-	nodes.forEach(d => {d.y = d.depth = d.depth*50});
-
-	// ********nodes section ************
-
-	var node = canvas.selectAll(".node")
-				.data(nodes, function(d){return d.id ||(d.id = ++i);});
-				console.log("node");
-
-	console.log(node);
-	var nodeEnter = node.enter()
-					.append('g')
-					.attr('class', 'node')
-					.attr('transform', function (d){return 'translate(' + root.y0 + ',' + root.x0 + ')';});
 	
-	nodeEnter.append("rect")
-			.attr('class', 'node')
-			.attr('width', 20)
-			.attr('height', 20)
-			.attr('opacity', 0.8)
-			.attr("fill", "blue").on("pointerover", function(p,d){
-						console.log(d);
-				});
+	
+	return svg;
+}  
 
+/////////////////////////////////////////////////////////////////
+/////////////////////Water nodes and links//////////////////////
+///////////////////////////////////////////////////////////////
+function Initialize_tree(jsonData){
+// Initialize treemap layout with a size
+
+var treeMap = d3.tree().size([height, width]);
+var root = d3.hierarchy(jsonData, function(d){return d.children;});
+// Set the start point of root node
+root.x0 = height/2;
+root.y0 = 0;
+console.log("root");
+console.log(root);
+
+//get x and y coordinates for nodes
+var treeData = treeMap(root);
+
+// Converts tree structured data into array format for nodes and links
+var nodes = treeData.descendants(),
+// slice to remove root node as there are no connections
+links = treeData.descendants().slice(1);
+
+//normalize depth
+nodes.forEach(d => {d.x = d.x - 100;d.y = d.depth*150;});
+
+return [root, nodes, links];
+}
+
+/////////////////////////////////////////////////////////////////
+/////////////////////tooltip for node//////////////////////
+///////////////////////////////////////////////////////////////
+function add_text(nodeEnter){
 	nodeEnter.append('text')
 	.attr('dy', '.35em')
 	.attr('x', function(d){return d.children || d._children ? 33 : 53;})
@@ -138,119 +110,138 @@ var i = 0,
 	.attr("font-size", "12px")
 	.attr('fill', "black")
 	.attr('text-anchor', function(d){
-		console.log("d");
-		console.log(d);
-		console.log(d.children || d._children ? 'end' : 'end');
+		//console.log("d");
+		//console.log(d);
+		//console.log(d.children || d._children ? 'end' : 'end');
 		return d.children || d._children ? 'start' : 'end'
 	})
 	.text(function(d) {return d.data.name;});
+return nodeEnter;
+}
 
+function draw_nodes(root,treeIndex, nodes){
+	var i = 0;
+	var node = canvas.selectAll(".node" + String(treeIndex))
+				.data(nodes, function(d){return d.id ||(d.id = ++i);});
+			//	console.log("node");
+
+	// console.log(node);
+	var nodeEnter = node.enter()
+					.append('g')
+					.attr('class', 'node')
+					.attr('transform', function (d){return 'translate(' + root.y0 + ',' + root.x0 + ')';});
+
+	nodeEnter.append("rect")
+			.attr('class', 'node')
+			.attr('width', squareDim)
+			.attr('height', squareDim)
+			.attr('opacity', 0.8)
+			.attr("fill", "blue")
+			.on("pointerover", function(p,d){
+						//console.log(d);
+				});
+
+	nodeEnter = add_text(nodeEnter);
 
 	var nodeUpdate = nodeEnter.merge(node);
-	
+
 	nodeUpdate.transition()
-    .duration(duration)
-    .attr("transform", function(d) { 
-        return "translate(" + d.y + "," + d.x + ")";
-     });
+	.duration(750)
+	.attr("transform", function(d) { 
+		return "translate(" + d.y + "," + (d.x+d.data.feat*squareDim) + ")";
+	});
 
-	 nodeUpdate.select('rect.node')
-	 .attr('width', 20)
-	 .attr('height', 20)
-	 .attr('opacity', 0.8)
-	 .attr("fill", "blue");
+	nodeUpdate.select('rect.node')
+	.attr('width', squareDim)
+	.attr('height', squareDim)
+	.attr('opacity', 0.2)
+	.attr("fill", "blue")
+	.style("stroke", "black");
 
-	 // ******** All about the links ******
+}
 
-	 var link = canvas.selectAll('path.link')
-	 				.data(links, function(d){return d.id;});
+function draw_links(root,treeIndex, links){
+	console.log("links")
+	console.log(links)
+	var link = canvas.selectAll('path.link' + String(treeIndex))
+					.data(links, function(d){return d.id;});
 
 	var linkEnter = link.enter()
 						.insert('path', "g")
 						.attr("class", "link")
 						.attr("stroke", "red")
 						.attr("fill", "none")
-						.attr("stroke-width", "0.5px")
-						.attr('d', function(d){
-							var o = {x: root.x0, y: root.y0};
-							return diagonal(o,o);
-						});
+						.attr("stroke-width", "0.5px");
+
+						// .attr('d', function(d){
+						// 	var o = {x: root.x0, y: root.y0};
+						// 	return diagonal(o,o);
+						// })
 
 					//  .attr("d", function(d){
 					// 	 var o = {x : d.source.x0, y: d.source.y0};
 					// 	 return diagonal(o,o);
 					//  });
 
-	console.log("link generated");
-	console.log(link);
+	//console.log("link generated");
+	//console.log(link);
 	var linkUpdate = linkEnter.merge(link)
-	.attr('d', function(d){ return diagonal(d, d.parent) });
+					.attr('d', function(d,i){ return diagonal(d, d.parent,i)});
 
+}
 
+function draw_tree(jsonData,treeIndex){
+	// *********get initializations*******************
+	var [root, nodes, links] = Initialize_tree(jsonData);
 
+	// ********nodes section ************
+	draw_nodes(root,treeIndex, nodes);
 
-	// var nodes = d3.hierarchy(jsonData, function(d) {
-	// 	return d.children;
-	// 	});
-
-	// nodes = treeMap(nodes);
+	// ******** All about the links ******
+	draw_links(root,treeIndex, links);
+}
 	
-	// //var links = nodes.descendants().slice(1);
-	// var links = treeMap.links(nodes);
-	// console.log(links);
+////////////////////////////////////////////////////////////////////
+/////////////////////// MAIN //////////////////////////////////////
+//////////////////////////////////////////////////////////////////
+function main(){
 
-	// //console.log(links);
-	// console.log(nodes);
-
-	// var node = canvas.selectAll(".node")
-	// .data(nodes)
-	// .enter()
-	// .append("g")
-	// .attr("class", "node")
-	// .attr("transform", function (d){
-	// 	console.log(d.x);
-	// 	xc=d.x+100;
-	// 	return "translate(" + xc + "," + d.y + ")";
-	// });
-
-	// node.append("rect")
-	// 	.attr("width", 20)
-	// 	.attr("height", 20)
-	// 	.attr("opacity", 0.8)
-	// 	.attr("fill", "blue").on("pointerover", function(p,d){
-	// 		console.log(d);
+	// Radial tree seems to be a cool idea
+	canvas = build_canvas();
+	draw_tree(jsonSK2);//draw_tree(jsonSK);	
+		
+	// var zoom = d3.zoom()
+    //   .scaleExtent([1, 8])
+    //   	.on('zoom', function(event) {
+    //       canvas.selectAll('')
+    //        .attr('transform', event.transform);
 	// 	});
-	
-	// 	var diagonal = d3.linkHorizontal()
-	// 						.x(function(d){return d.x})
-	// 						.y(function(d){return d.y});
 
-	// var lines = canvas.selectAll(".lines")
-	// .data(links)
-	// .enter()
-	// .append("g")
-	// .attr("class" , "lines");
+	// canvas.call(zoom);
 
-	// lines.append("path")
-	// .attr("fill", "none")
-	// .attr("stroke", "black")
-	// .attr("d", diagonal);
+	function zoomed({transform}) {
+		canvas.attr("transform", transform);
+	  }
+	  
+	canvas.call(d3.zoom()
+	.extent([[0, 0], [width, height]])
+	.scaleExtent([0, 2])
+	.on("zoom", zoomed));
 
-	// 	var node1 = canvas.selectAll(".node1")
-	// .data(nodes)
-	// .enter()
-	// .append("g")
-	// .attr("class", "node")
-	// .attr("transform", function (d){
-	// 	console.log(d.x);
-	// 	xc=d.x+100;
-	// 	return "translate(" + xc + "," + d.y + ")";
-	// });
+	var fisheye = d3.fisheye.circular()
+    .radius(200)
+    .distortion(2);
+	var fisheye = d3.fisheye();
+	// canvas.on("mousemove", function() {
+	// 	fisheye.focus(d3.mouse(this));
+	//   });
+	canvas.on("pointerover", function() {
+		fisheye.center(d3.mouse(this));
+		path.attr("d", function(d) { return line(d.map(fisheye)); });
+	  });
+	  
 
-	// node1.append("rect")
-	// 	.attr("width", 20)
-	// 	.attr("height", 20)
-	// 	.attr("opacity", 0.3)
-	// 	.attr("fill", "blue").on("pointerover", function(p,d){
-	// 		console.log(d);
-	// 	});
+	//jsonList.forEach(function(d, i){draw_tree(d, i);});
+}
+
+main();
