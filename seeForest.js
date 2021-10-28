@@ -55,7 +55,7 @@ if(Number.isNaN(xmul)){
 			${d.y+squareDim} , ${d.x+xmul}`
 
     return path
-  }
+}
   
 
   function diagonals(s, d,dataSlice) {
@@ -84,18 +84,16 @@ if(Number.isNaN(xmul)){
 	// console.log("xmuls");
 	// console.log(xmulP);
 	// console.log(xmulC);
-
 	// console.log(xmul);
 	
 	if(Number.isNaN(xmul)){
 		xmul = squareDim+ squareDim*1;
 	}
 
-
-		path = `M ${s.y}, ${s.x+xmulP}
-				C ${(s.y + d.y) / 2} ${s.x+xmulP},
-				${(s.y + d.y) / 2} ${d.x+ xmulC},
-				${d.y+squareDim} , ${d.x+xmulC}`
+		path = `M ${s.y}, ${s.x+xmulC}
+				C ${(s.y + d.y + squareDim) / 2} ${s.x+xmulC},
+				${(s.y + d.y + squareDim) / 2} ${d.x+ xmulP},
+				${d.y+squareDim} , ${d.x+xmulP}`
 	
 					// return "M" + d.source.y + "," + d.source.x
 					// 	+ "C" + (d.source.y + d.target.y) / 2 + "," + d.source.x
@@ -103,7 +101,7 @@ if(Number.isNaN(xmul)){
 					// 	+ " " + d.target.y + "," + d.target.x;
 
 		return path
-	  }
+}
 	
 /////////////////////////////////////////////////////////////////
 /////////////////////Function to build svg//////////////////////
@@ -171,7 +169,7 @@ function add_text(nodeEnter){
 return nodeEnter;
 }
 
-function draw_nodes(root,treeIndex, nodes){
+function draw_nodes(root,treeIndex, nodes, emptyBox=0){
 
 	var i = 0;
 	var node = canvas.selectAll(".node" + String(treeIndex))
@@ -196,20 +194,37 @@ function draw_nodes(root,treeIndex, nodes){
 
 	var nodeUpdate = nodeEnter.merge(node);
 
-	nodeUpdate.transition()
-	.duration(750)
-	.attr("transform", function(d) { 
-		
-		return "translate(" + d.y + "," + (d.x + (squareDim*(positions[d.data.name])))+ ")";
-
-	});
-
-	nodeUpdate.select('rect.node')
-	.attr('width', squareDim)
-	.attr('height', squareDim)
-	.attr('opacity', 0.2)
-	.attr("fill", "blue")
-	.style("stroke", "black");
+	if(emptyBox==0){
+		nodeUpdate.transition()
+		.duration(750)
+		.attr("transform", function(d) { 
+			
+			return "translate(" + d.y + "," + (d.x + (squareDim*(positions[d.data.name])))+ ")";
+	
+		});
+	
+		nodeUpdate.select('rect.node')
+		.attr('width', squareDim)
+		.attr('height', squareDim)
+		.attr('opacity', 0.2)
+		.attr("fill", "blue")
+		.style("stroke", "black");
+	
+	}
+	else {
+		nodeUpdate.transition()
+		.duration(750)
+		.attr("transform", function(d) { 
+			return "translate(" + d.y + "," + (d.x + (squareDim*emptyBox))+ ")";
+		});
+	
+		nodeUpdate.select('rect.node')
+		.attr('width', squareDim)
+		.attr('height', squareDim)
+		.attr('opacity', 0.2)
+		.attr("fill", "none")
+		.style("stroke", "black");
+	}
 }
 
 function draw_links(root,treeIndex, links){
@@ -244,8 +259,8 @@ function draw_links(root,treeIndex, links){
 		var linkUpdate = linkEnter.merge(link);
 
 		// linkUpdate.attr('d', function(d,rule){ return (console.log(ruleData[rule][i], rule))});
-
 		// linkUpdate.attr('d', function(d,rule){ return (ruleData[rule][i]==1)?console.log("some"):console.log("none");});
+		
 		linkUpdate.attr('d', function(d,rule){ return (ruleData[String(rule)][i]==1)?diagonals(d, d.parent,dataSlice):null;});
 	};
 	// var count = 0;
@@ -267,14 +282,42 @@ function draw_links(root,treeIndex, links){
 }
 
 function draw_tree(jsonData,treeIndex){
+	// // *********get initializations*******************
+	// var [root, nodes, links] = Initialize_tree(jsonData);
+
+	// // ********nodes section ************
+	// draw_nodes(root,treeIndex, nodes);
+
+	// // ******** All about the links ******
+	// draw_links(root,treeIndex, links);
+
+
+	// draw_nodes(root,treeIndex, nodes, emptyBox=1);
+	// draw_nodes(root,treeIndex, nodes, emptyBox=2);
+	// draw_nodes(root,treeIndex, nodes, emptyBox=3);
+	// draw_nodes(root,treeIndex, nodes, emptyBox=4);
+	// draw_nodes(root,treeIndex, nodes, emptyBox=5);
+
+
+	jsonSK2= jsonSK22;
+	ruleData = ruleData2;
+
 	// *********get initializations*******************
-	var [root, nodes, links] = Initialize_tree(jsonData);
+	var [root, nodes, links] = Initialize_tree(jsonSK22);
 
 	// ********nodes section ************
 	draw_nodes(root,treeIndex, nodes);
 
 	// ******** All about the links ******
 	draw_links(root,treeIndex, links);
+
+
+	draw_nodes(root,treeIndex, nodes, emptyBox=1);
+	draw_nodes(root,treeIndex, nodes, emptyBox=2);
+	draw_nodes(root,treeIndex, nodes, emptyBox=3);
+	draw_nodes(root,treeIndex, nodes, emptyBox=4);
+	draw_nodes(root,treeIndex, nodes, emptyBox=5);
+
 }
 	
 ////////////////////////////////////////////////////////////////////
@@ -285,7 +328,6 @@ function main(){
 	// Radial tree seems to be a cool idea
 	canvas = build_canvas();
 	draw_tree(jsonSK2);//draw_tree(jsonSK);	
-		
 	// var zoom = d3.zoom()
     //   .scaleExtent([1, 8])
     //   	.on('zoom', function(event) {
