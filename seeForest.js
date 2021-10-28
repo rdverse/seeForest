@@ -190,7 +190,9 @@ function draw_nodes(root,treeIndex, nodes, emptyBox=0){
 				//console.log(d);
 				});
 
-	nodeEnter = add_text(nodeEnter);
+	if(emptyBox==0){nodeEnter = add_text(nodeEnter);
+	}
+	
 
 	var nodeUpdate = nodeEnter.merge(node);
 
@@ -283,27 +285,7 @@ function draw_links(root,treeIndex, links){
 
 function draw_tree(jsonData,treeIndex){
 	// // *********get initializations*******************
-	// var [root, nodes, links] = Initialize_tree(jsonData);
-
-	// // ********nodes section ************
-	// draw_nodes(root,treeIndex, nodes);
-
-	// // ******** All about the links ******
-	// draw_links(root,treeIndex, links);
-
-
-	// draw_nodes(root,treeIndex, nodes, emptyBox=1);
-	// draw_nodes(root,treeIndex, nodes, emptyBox=2);
-	// draw_nodes(root,treeIndex, nodes, emptyBox=3);
-	// draw_nodes(root,treeIndex, nodes, emptyBox=4);
-	// draw_nodes(root,treeIndex, nodes, emptyBox=5);
-
-
-	jsonSK2= jsonSK22;
-	ruleData = ruleData2;
-
-	// *********get initializations*******************
-	var [root, nodes, links] = Initialize_tree(jsonSK22);
+	var [root, nodes, links] = Initialize_tree(jsonData);
 
 	// ********nodes section ************
 	draw_nodes(root,treeIndex, nodes);
@@ -317,6 +299,26 @@ function draw_tree(jsonData,treeIndex){
 	draw_nodes(root,treeIndex, nodes, emptyBox=3);
 	draw_nodes(root,treeIndex, nodes, emptyBox=4);
 	draw_nodes(root,treeIndex, nodes, emptyBox=5);
+
+
+	// jsonSK2= jsonSK22;
+	// ruleData = ruleData2;
+
+	// // *********get initializations*******************
+	// var [root, nodes, links] = Initialize_tree(jsonSK22);
+
+	// // ********nodes section ************
+	// draw_nodes(root,treeIndex, nodes);
+
+	// // ******** All about the links ******
+	// draw_links(root,treeIndex, links);
+
+
+	// draw_nodes(root,treeIndex, nodes, emptyBox=1);
+	// draw_nodes(root,treeIndex, nodes, emptyBox=2);
+	// draw_nodes(root,treeIndex, nodes, emptyBox=3);
+	// draw_nodes(root,treeIndex, nodes, emptyBox=4);
+	// draw_nodes(root,treeIndex, nodes, emptyBox=5);
 
 }
 	
