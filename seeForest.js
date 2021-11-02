@@ -9,6 +9,7 @@ var margin = {top:30, right:60, left:60, bottom:30 },
 var canvas;
 var squareDim = 20;
 var ss;
+var treeMap;
 /////////////////////////////////////////////////////////////////
 /////////////////////Function to draw lines for each link///////
 ///////////////////////////////////////////////////////////////
@@ -117,12 +118,19 @@ function build_canvas(){
 }  
 
 /////////////////////////////////////////////////////////////////
+/////////////////////Set the tree map //////////////////////
+///////////////////////////////////////////////////////////////
+function set_tree_map(){
+	treeMap = d3.tree().size([height, width]).nodeSize([squareDim*7,squareDim*7]);
+
+}
+
+/////////////////////////////////////////////////////////////////
 /////////////////////Water nodes and links//////////////////////
 ///////////////////////////////////////////////////////////////
 function Initialize_tree(jsonData){
 // Initialize treemap layout with a size
 
-var treeMap = d3.tree().size([height, width]);
 var root = d3.hierarchy(jsonData, function(d){return d.children;});
 // Set the start point of root node
 root.x0 = height/2;
@@ -139,7 +147,7 @@ var nodes = treeData.descendants(),
 links = treeData.descendants().slice(1);
 
 //normalize depth
-nodes.forEach(d => {d.x = d.x - 100;d.y = d.depth*150;});
+nodes.forEach(d => {d.x = d.x +250;d.y = d.depth*150;});
 
 // nodes.forEach(d => {d.x = d.x + squareDim*(positions[d.data.name]); console.log(positions[d.data.name]);});
 
@@ -208,6 +216,8 @@ function draw_nodes(root,treeIndex, nodes, emptyBox=0){
 		nodeUpdate.select('rect.node')
 		.attr('width', squareDim)
 		.attr('height', squareDim)
+		.transition()
+		.delay((d,i) => i*1000)
 		.attr('opacity', 0.2)
 		.attr("fill", "blue")
 		.style("stroke", "black");
@@ -215,7 +225,7 @@ function draw_nodes(root,treeIndex, nodes, emptyBox=0){
 	}
 	else {
 		nodeUpdate.transition()
-		.duration(750)
+		.duration(500)
 		.attr("transform", function(d) { 
 			return "translate(" + d.y + "," + (d.x + (squareDim*emptyBox))+ ")";
 		});
@@ -225,7 +235,9 @@ function draw_nodes(root,treeIndex, nodes, emptyBox=0){
 		.attr('height', squareDim)
 		.attr('opacity', 0.2)
 		.attr("fill", "none")
-		.style("stroke", "black");
+		.transition()
+		.delay((d,i) => i*1000)
+		.style("stroke", function(d){return "black"});
 	}
 }
 
@@ -284,21 +296,7 @@ function draw_links(root,treeIndex, links){
 }
 
 function draw_tree(jsonData,treeIndex){
-	// // *********get initializations*******************
-	var [root, nodes, links] = Initialize_tree(jsonData);
-
-	// ********nodes section ************
-	draw_nodes(root,treeIndex, nodes);
-
-	// ******** All about the links ******
-	draw_links(root,treeIndex, links);
-
-
-	draw_nodes(root,treeIndex, nodes, emptyBox=1);
-	draw_nodes(root,treeIndex, nodes, emptyBox=2);
-	draw_nodes(root,treeIndex, nodes, emptyBox=3);
-	draw_nodes(root,treeIndex, nodes, emptyBox=4);
-	draw_nodes(root,treeIndex, nodes, emptyBox=5);
+	set_tree_map();
 
 
 	// jsonSK2= jsonSK22;
@@ -320,6 +318,25 @@ function draw_tree(jsonData,treeIndex){
 	// draw_nodes(root,treeIndex, nodes, emptyBox=4);
 	// draw_nodes(root,treeIndex, nodes, emptyBox=5);
 
+
+
+	// // *********get initializations*******************
+	var [root, nodes, links] = Initialize_tree(jsonData);
+
+	// ********nodes section ************
+	draw_nodes(root,treeIndex, nodes);
+
+	// ******** All about the links ******
+	draw_links(root,treeIndex, links);
+	console.log("draw_tree");
+
+	draw_nodes(root,treeIndex, nodes, emptyBox=1);
+	draw_nodes(root,treeIndex, nodes, emptyBox=2);
+	draw_nodes(root,treeIndex, nodes, emptyBox=3);
+	draw_nodes(root,treeIndex, nodes, emptyBox=4);
+	draw_nodes(root,treeIndex, nodes, emptyBox=5);
+
+	console.log(nodes);
 }
 	
 ////////////////////////////////////////////////////////////////////
@@ -329,7 +346,9 @@ function main(){
 
 	// Radial tree seems to be a cool idea
 	canvas = build_canvas();
-	draw_tree(jsonSK2);//draw_tree(jsonSK);	
+	draw_tree(jsonSK2);
+	
+	//draw_tree(jsonSK);	
 	// var zoom = d3.zoom()
     //   .scaleExtent([1, 8])
     //   	.on('zoom', function(event) {
