@@ -151,8 +151,10 @@ nodes.forEach(d => {d.x = d.x +250;d.y = d.depth*150;});
 
 // nodes.forEach(d => {d.x = d.x + squareDim*(positions[d.data.name]); console.log(positions[d.data.name]);});
 
-nodes.forEach(d => {d.x = d.x + squareDim*(positions[d.data.name]);});
+nodes.forEach(d => {d.x = d.x  -squareDim*(positions[d.data.name]);});
 
+
+// nodes.forEach(d => {d.x = d.x + positions[d.data.name]>2 ? -squareDim*(positions[d.data.name]);});
 
 return [root, nodes, links];
 }
@@ -195,7 +197,7 @@ function draw_nodes(root,treeIndex, nodes, emptyBox=0){
 			.attr('width', squareDim)
 			.attr('height', squareDim)
 			.on("pointerover", function(p,d){
-				//console.log(d);
+				console.log(d);
 				});
 
 	if(emptyBox==0){nodeEnter = add_text(nodeEnter);
@@ -275,7 +277,9 @@ function draw_links(root,treeIndex, links){
 		// linkUpdate.attr('d', function(d,rule){ return (console.log(ruleData[rule][i], rule))});
 		// linkUpdate.attr('d', function(d,rule){ return (ruleData[rule][i]==1)?console.log("some"):console.log("none");});
 		
-		linkUpdate.attr('d', function(d,rule){ return (ruleData[String(rule)][i]==1)?diagonals(d, d.parent,dataSlice):null;});
+		linkUpdate.transition()
+		 .delay((d,i) => i*1000)
+		 .attr('d', function(d,rule){ return (ruleData[String(rule)][i]==1)?diagonals(d, d.parent,dataSlice):null;});
 	};
 	// var count = 0;
 	// // console.log(ruleData); 	
