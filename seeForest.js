@@ -39,7 +39,7 @@ for(rule in ruleData[i]){
 var xmul;
 	try{
 		// console.log("try");
-		xmul = squareDim*s.data["val"] + squareDim*(s.data["feat"]);
+		xmul = squareDim*s.data["val"];// + squareDim*(s.data["feat"]);
 	}
 	catch{
 		// console.log("catch");
@@ -47,7 +47,7 @@ var xmul;
 	}
 
 if(Number.isNaN(xmul)){
-	xmul = squareDim+ squareDim*(s.data["feat"]-1);
+	xmul = squareDim;//+ squareDim*(s.data["feat"]-1);
 }
 
 	path = `M ${s.y}, ${s.x+xmul}
@@ -304,7 +304,7 @@ function draw_links(root,treeIndex, links){
 function draw_tree(jsonData,treeIndex){
 	set_tree_map();
 
-	// jsonSK2= jsonSK2empty;
+	jsonSK2= jsonSK2empty;
 
 	// jsonSK2= jsonSK22;
 	// ruleData = ruleData2;
@@ -316,7 +316,7 @@ function draw_tree(jsonData,treeIndex){
 	draw_nodes(root,treeIndex, nodes);
 
 	//******** All about the links ******
-	draw_links(root,treeIndex, links);
+	// draw_links(root,treeIndex, links);
 
 	draw_nodes(root,treeIndex, nodes, emptyBox=1);
 	draw_nodes(root,treeIndex, nodes, emptyBox=2);
