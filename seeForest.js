@@ -68,7 +68,9 @@ if(Number.isNaN(xmul)){
 	if(childName=="leaf"){
 	childName = parentName;	
 	}
-
+	if(childName=="empty"){
+		childName = parentName;	
+		}
 	var xmul;
 
 //	console.log(jsonData[childName][ruleIndex]);
@@ -219,7 +221,7 @@ function draw_nodes(root,treeIndex, nodes, emptyBox=0){
 		.attr('width', squareDim)
 		.attr('height', squareDim)
 		.transition()
-		.delay((d,i) => i*1000)
+		.delay((d,i) => i*100)
 		.attr('opacity', 0.2)
 		.attr("fill", "blue")
 		.style("stroke", "black");
@@ -238,7 +240,7 @@ function draw_nodes(root,treeIndex, nodes, emptyBox=0){
 		.attr('opacity', 0.2)
 		.attr("fill", "none")
 		.transition()
-		.delay((d,i) => i*1000)
+		.delay((d,i) => i*100)
 		.style("stroke", function(d){return "black"});
 	}
 }
@@ -278,7 +280,7 @@ function draw_links(root,treeIndex, links){
 		// linkUpdate.attr('d', function(d,rule){ return (ruleData[rule][i]==1)?console.log("some"):console.log("none");});
 		
 		linkUpdate.transition()
-		 .delay((d,i) => i*1000)
+		 .delay((d,i) => i*100)
 		 .attr('d', function(d,rule){ return (ruleData[String(rule)][i]==1)?diagonals(d, d.parent,dataSlice):null;});
 	};
 	// var count = 0;
@@ -302,37 +304,19 @@ function draw_links(root,treeIndex, links){
 function draw_tree(jsonData,treeIndex){
 	set_tree_map();
 
+	// jsonSK2= jsonSK2empty;
 
 	// jsonSK2= jsonSK22;
 	// ruleData = ruleData2;
 
-	// // *********get initializations*******************
-	// var [root, nodes, links] = Initialize_tree(jsonSK22);
+	// *********get initializations*******************
+	var [root, nodes, links] = Initialize_tree(jsonSK2);
 
-	// // ********nodes section ************
-	// draw_nodes(root,treeIndex, nodes);
-
-	// // ******** All about the links ******
-	// draw_links(root,treeIndex, links);
-
-
-	// draw_nodes(root,treeIndex, nodes, emptyBox=1);
-	// draw_nodes(root,treeIndex, nodes, emptyBox=2);
-	// draw_nodes(root,treeIndex, nodes, emptyBox=3);
-	// draw_nodes(root,treeIndex, nodes, emptyBox=4);
-	// draw_nodes(root,treeIndex, nodes, emptyBox=5);
-
-
-
-	// // *********get initializations*******************
-	var [root, nodes, links] = Initialize_tree(jsonData);
-
-	// ********nodes section ************
+	//********nodes section ************
 	draw_nodes(root,treeIndex, nodes);
 
-	// ******** All about the links ******
+	//******** All about the links ******
 	draw_links(root,treeIndex, links);
-	console.log("draw_tree");
 
 	draw_nodes(root,treeIndex, nodes, emptyBox=1);
 	draw_nodes(root,treeIndex, nodes, emptyBox=2);
@@ -340,7 +324,25 @@ function draw_tree(jsonData,treeIndex){
 	draw_nodes(root,treeIndex, nodes, emptyBox=4);
 	draw_nodes(root,treeIndex, nodes, emptyBox=5);
 
-	console.log(nodes);
+
+
+	// // // *********get initializations*******************
+	// var [root, nodes, links] = Initialize_tree(jsonData);
+
+	// // ********nodes section ************
+	// draw_nodes(root,treeIndex, nodes);
+
+	// // ******** All about the links ******
+	// draw_links(root,treeIndex, links);
+	// console.log("draw_tree");
+
+	// draw_nodes(root,treeIndex, nodes, emptyBox=1);
+	// draw_nodes(root,treeIndex, nodes, emptyBox=2);
+	// draw_nodes(root,treeIndex, nodes, emptyBox=3);
+	// draw_nodes(root,treeIndex, nodes, emptyBox=4);
+	// draw_nodes(root,treeIndex, nodes, emptyBox=5);
+
+	// console.log(nodes);
 }
 	
 ////////////////////////////////////////////////////////////////////

@@ -78,7 +78,7 @@ def export_matrix():
 ax = plt.subplot()
 data = load_iris()
 
-clf = DecisionTreeClassifier(max_depth=3)
+clf = DecisionTreeClassifier(max_depth=2)
 clf.fit(data.data, data.target)
 # node = {}
 scale = MinMaxScaler()

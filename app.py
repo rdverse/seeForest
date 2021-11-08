@@ -22,14 +22,14 @@ from sklearn.tree import DecisionTreeClassifier, plot_tree, export_text
 x="something"
 
 class node:
-    def __init__(self) -> None:
+    def __init__(self):
         self.name = 'node'
         self.number = 0
         self.left = None
         self.right = None
 
 class nodes:
-    def __init__(self) -> None:
+    def __init__(self):
         self.nodeList = 'node'
         self.left = None
         self.right = None
@@ -38,13 +38,13 @@ class nodes:
 class treeDataMaker():
     data = load_iris()
 
-    def __init__(self, **kwargs) -> None:
+    def __init__(self, **kwargs):
         self.forestOfTrees = list()
         self.scaled_data = self.scale_data()
         self.clf = self.build_clf(**kwargs)
         self.tree_grabber()
 
-    def build_clf(self,**kwargs) -> __name__:
+    def build_clf(self,**kwargs) :
         clf = RandomForestClassifier()
         clf.set_params(**kwargs)
         clf.fit(self.data.data, self.data.target)
@@ -130,7 +130,7 @@ def export_matrix():
 
 
 if __name__=='__main__':
-    tree = treeDataMaker(n_estimators = 2, max_depth=5, random_state=7683)
+    tree = treeDataMaker(n_estimators = 2, max_depth=2, random_state=7683)
 
 #dcbxzygayqeb
 
