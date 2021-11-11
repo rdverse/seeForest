@@ -10,6 +10,7 @@ var canvas;
 var squareDim = 20;
 var ss;
 var treeMap;
+var links = 0;
 /////////////////////////////////////////////////////////////////
 /////////////////////Function to draw lines for each link///////
 ///////////////////////////////////////////////////////////////
@@ -59,10 +60,13 @@ if(Number.isNaN(xmul)){
 }
   
 
-  function diagonals(s, d,dataSlice) {
-	
-	var childName = s.data.name;
-	var parentName = d.data.name;
+  function diagonals(p, c, dataSlice) {
+	// var temp = s;
+	// s = d;
+	// d=temp;
+
+	var parentName = p.data.name;	
+	var childName = c.data.name;
 	var childNameCopy = childName;
 
 	if(childName=="leaf"){
@@ -74,16 +78,16 @@ if(Number.isNaN(xmul)){
 	var xmul;
 
 //	console.log(jsonData[childName][ruleIndex]);
-	positionC = positions[childNameCopy];
 	positionP = positions[parentName];
-
+	positionC = positions[childNameCopy];
+	
 	// console.log("postiions");
 	// console.log(positionP);
 	// console.log(positionC);
 
 	xmulP = squareDim* dataSlice[childName] + squareDim*positionP;
 	xmulC = squareDim* dataSlice[childName] + squareDim*positionC;
-
+	//console.log(dataSlice[childName]);
 	// console.log("xmuls");
 	// console.log(xmulP);
 	// console.log(xmulC);
@@ -93,11 +97,17 @@ if(Number.isNaN(xmul)){
 		xmul = squareDim+ squareDim*1;
 	}
 
-		path = `M ${s.y}, ${s.x+xmulC}
-				C ${(s.y + d.y + squareDim) / 2} ${s.x+xmulC},
-				${(s.y + d.y + squareDim) / 2} ${d.x+ xmulP},
-				${d.y+squareDim} , ${d.x+xmulP}`
+				path = `M ${p.x + xmulP}, ${p.y+squareDim}
+				C ${((p.x + c.x +20) / 2)} ${p.y+squareDim/2},
+				${((p.x + c.x +20) / 2)} ${c.y+squareDim/2},
+				${c.x+xmulC} , ${c.y}`
 	
+				// path = `M ${s.y}, ${s.x+xmulC}
+				// C ${(s.y + d.y + squareDim) / 2} ${s.x+xmulC},
+				// ${(s.y + d.y + squareDim) / 2} ${d.x+ xmulP},
+				// ${d.y+squareDim} , ${d.x+xmulP}`
+	
+
 					// return "M" + d.source.y + "," + d.source.x
 					// 	+ "C" + (d.source.y + d.target.y) / 2 + "," + d.source.x
 					// 	+ " " + (d.source.y + d.target.y) / 2 + "," + d.target.x
@@ -144,12 +154,12 @@ root.y0 = 0;
 var treeData = treeMap(root);
 
 // Converts tree structured data into array format for nodes and links
-var nodes = treeData.descendants(),
+var nodes = treeData.descendants().reverse(),
 // slice to remove root node as there are no connections
 links = treeData.descendants().slice(1);
 
 //normalize depth
-nodes.forEach(d => {d.x = d.x +250;d.y = d.depth*150;});
+nodes.forEach(d => {d.x = d.x +450;d.y = d.depth*150;});
 
 // nodes.forEach(d => {d.x = d.x + squareDim*(positions[d.data.name]); console.log(positions[d.data.name]);});
 
@@ -192,7 +202,7 @@ function draw_nodes(root,treeIndex, nodes, emptyBox=0){
 	var nodeEnter = node.enter()
 					.append('g')
 					.attr('class', 'node')
-					.attr('transform', function (d){return 'translate(' + root.y0 + ',' + root.x0 + ')';});
+					.attr('transform', function (d){return 'translate(' + root.x0 + ',' + root.y0 + ')';});
 
 	nodeEnter.append("rect")
 			.attr('class', 'node')
@@ -213,7 +223,7 @@ function draw_nodes(root,treeIndex, nodes, emptyBox=0){
 		.duration(750)
 		.attr("transform", function(d) { 
 			
-			return "translate(" + d.y + "," + (d.x + (squareDim*(positions[d.data.name])))+ ")";
+			return "translate(" + (d.x+(squareDim*(positions[d.data.name]))) + "," + d.y+ ")";
 	
 		});
 	
@@ -231,7 +241,7 @@ function draw_nodes(root,treeIndex, nodes, emptyBox=0){
 		nodeUpdate.transition()
 		.duration(500)
 		.attr("transform", function(d) { 
-			return "translate(" + d.y + "," + (d.x + (squareDim*emptyBox))+ ")";
+			return "translate(" + (d.x + (squareDim*emptyBox)) + "," + d.y+ ")";
 		});
 	
 		nodeUpdate.select('rect.node')
@@ -281,7 +291,7 @@ function draw_links(root,treeIndex, links){
 		
 		linkUpdate.transition()
 		 .delay((d,i) => i*100)
-		 .attr('d', function(d,rule){ return (ruleData[String(rule)][i]==1)?diagonals(d, d.parent,dataSlice):null;});
+		 .attr('d', function(d,rule){ return (ruleData[String(rule)][i]==1)?diagonals(d.parent,d,dataSlice):null;});
 	};
 	// var count = 0;
 	// // console.log(ruleData); 	
@@ -304,11 +314,12 @@ function draw_links(root,treeIndex, links){
 function draw_tree(jsonData,treeIndex){
 	set_tree_map();
 
-	jsonSK2= jsonSK2empty;
+	//jsonSK2= jsonSK2empty;
 
 	// jsonSK2= jsonSK22;
 	// ruleData = ruleData2;
-
+	// jsonSK2 = jsonSK2mini;
+	// ruleData=ruleDatamini;
 	// *********get initializations*******************
 	var [root, nodes, links] = Initialize_tree(jsonSK2);
 
@@ -316,8 +327,7 @@ function draw_tree(jsonData,treeIndex){
 	draw_nodes(root,treeIndex, nodes);
 
 	//******** All about the links ******
-	// draw_links(root,treeIndex, links);
-
+	draw_links(root,treeIndex, links);
 	draw_nodes(root,treeIndex, nodes, emptyBox=1);
 	draw_nodes(root,treeIndex, nodes, emptyBox=2);
 	draw_nodes(root,treeIndex, nodes, emptyBox=3);

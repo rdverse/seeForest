@@ -55,14 +55,19 @@ def export_dict(clf, feature_names=None):
     
     print(tree_nodes)
     # Link tree nodes
+    for node in tree_nodes:
+        print(node)
+        if node["name"]!="leaf":
+            node["children"] = list()
+            node["children"].append(tree_nodes[node["right"]])
+            node["children"].append(tree_nodes[node["left"]])
+
     # for node in tree_nodes:
     #     print(node)
-    #     if node["name"]!="leaf":
-    #         node["children"] = list()
-    #         node["children"].append(tree_nodes[node["left"]])
-    #         node["children"].append(tree_nodes[node["right"]])
+    #     if node["name"]!="leaf": 
 
-    print(tree_nodes[0])
+
+    #print(tree_nodes[0])
 
     # Return root node
     return tree_nodes[0]
@@ -78,7 +83,7 @@ def export_matrix():
 ax = plt.subplot()
 data = load_iris()
 
-clf = DecisionTreeClassifier(max_depth=2)
+clf = DecisionTreeClassifier(max_depth=3)
 clf.fit(data.data, data.target)
 # node = {}
 scale = MinMaxScaler()
@@ -103,7 +108,8 @@ plt.show()
 #out_file.close()11111111
 ruleMatrix = np.array(clf.tree_.decision_path(data.data.astype("float32")).todense()).astype("int")
 ruleJson = {}
-for i in range(1,9):
+
+for i in range(1,5):
     ruleJson[i-1] = ruleMatrix[:,i].flatten().tolist()
 
 dataJson = {}
