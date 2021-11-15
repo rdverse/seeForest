@@ -59,8 +59,8 @@ def export_dict(clf, feature_names=None):
         #print(node)
         if node["name"]!="leaf":
             node["children"] = list()
-            node["children"].append(tree_nodes[node["right"]])
             node["children"].append(tree_nodes[node["left"]])
+            node["children"].append(tree_nodes[node["right"]])
 
     # for node in tree_nodes:
     #     print(node)
@@ -145,7 +145,8 @@ import itertools
 data = load_iris()
 from sklearn.ensemble import RandomForestClassifier
 #clf = DecisionTreeClassifier(max_depth=2)
-rf = RandomForestClassifier(n_estimators =20, max_depth=2)
+depth = 4
+rf = RandomForestClassifier(n_estimators =20, max_depth=depth, random_state = 14)
 rf.fit(data.data, data.target)
 
 
@@ -155,10 +156,9 @@ rfRules = []
 
 for clf in rf.estimators_: 
     js = export_dict(clf,feature_names= data.feature_names)
-    depth=3
     ruleSetState = []
 
-    for i in range(1,depth):
+    for i in range(1,depth+1):
         levels = np.array([ np.array(seq).astype(int) for seq in itertools.product("01", repeat=i)])
         #print(levels.shape)
         print("#"*30)
@@ -175,20 +175,20 @@ for clf in rf.estimators_:
 
     ruleMatrix = np.array(clf.tree_.decision_path(data.data.astype("float32")).todense()).astype("int")
     rm = ruleMatrix
-    if js["children"][0]["children"][0]["name"]=="empty":
-        print("Adding zeros at 2 and 3")
-        ruleMatrix = np.insert(ruleMatrix, 5, np.zeros(150),axis=1)
-        ruleMatrix = np.insert(ruleMatrix, 6, np.zeros(150),axis=1)
+    # if js["children"][0]["children"][0]["name"]=="empty":
+    #     print("Adding zeros at 2 and 3")
+    #     ruleMatrix = np.insert(ruleMatrix, 5, np.zeros(150),axis=1)
+    #     ruleMatrix = np.insert(ruleMatrix, 6, np.zeros(150),axis=1)
         
-    if js["children"][1]["children"][0]["name"]=="empty":
-        print("Adding zeros at 4 and 5")
+    # if js["children"][1]["children"][0]["name"]=="empty":
+    #     print("Adding zeros at 4 and 5")
 
-        ruleMatrix = np.insert(ruleMatrix, 3, np.zeros(150),axis=1)
-        ruleMatrix = np.insert(ruleMatrix, 4, np.zeros(150),axis=1)
+    #     ruleMatrix = np.insert(ruleMatrix, 3, np.zeros(150),axis=1)
+    #     ruleMatrix = np.insert(ruleMatrix, 4, np.zeros(150),axis=1)
 
     ruleJson = {}
 
-    for i in range(1,7):
+    for i in range(1,ruleMatrix.shape[1]):
         ruleJson[i-1] = ruleMatrix[:,i].flatten().tolist()
         
 

@@ -10,7 +10,7 @@ var canvas;
 var squareDim = 20;
 var ss;
 var treeMap;
-var links = 0;
+var linksG = 0;
 /////////////////////////////////////////////////////////////////
 /////////////////////Function to draw lines for each link///////
 ///////////////////////////////////////////////////////////////
@@ -174,7 +174,7 @@ nodes.forEach(d => {d.x = d.x+300;d.y = d.depth*150;});
 
 
 // nodes.forEach(d => {d.x = d.x + positions[d.data.name]>2 ? -squareDim*(positions[d.data.name]);});
-
+linksG = links;
 return [root, nodes, links];
 }
 
@@ -219,8 +219,9 @@ function draw_nodes(root,treeIndex, nodes, emptyBox=0){
 				console.log(d);
 				});
 
-	// if(emptyBox==0){nodeEnter = add_text(nodeEnter);
-	// }
+	if(emptyBox==0){
+		nodeEnter = add_text(nodeEnter);
+	}
 	
 
 	var nodeUpdate = nodeEnter.merge(node);
@@ -242,7 +243,7 @@ function draw_nodes(root,treeIndex, nodes, emptyBox=0){
 		.attr('width', squareDim)
 		.attr('height', squareDim)
 		.transition()
-		.delay((d,i) => i*100)
+		.delay((d,i) => i*10)
 		.attr('opacity', 0.05)
 		.attr("fill", function(d){return d['data']['name']=="empty"?"white":"black";})
 		.style("stroke",function(d){return d['data']['name']=="empty"?"white":"black";})
@@ -306,9 +307,11 @@ function draw_links(root,treeIndex, links){
 		// linkUpdate.attr('d', function(d,rule){ return (console.log(ruleData[rule][i], rule))});
 		// linkUpdate.attr('d', function(d,rule){ return (ruleData[rule][i]==1)?console.log("some"):console.log("none");});
 		
+
+		console.log(ruleData);
 		linkUpdate.transition()
 		 .delay((d,i) => i*100)
-		 .attr('d', function(d,rule){ return (ruleData[String(rule)][i]==1)?diagonals(d,d.parent,dataSlice):null;});
+		 .attr('d', function(d,rule){ console.log(rule);return (ruleData[String(rule)][i]==1)?diagonals(d,d.parent,dataSlice):null;});
 	};
 	// var count = 0;
 	// // console.log(ruleData); 	
@@ -332,7 +335,6 @@ function draw_tree(jsonData,treeIndex){
 	set_tree_map();
 
 	//jsonSK2= jsonSK2empty;
-
 	// jsonSK2= jsonSK22;
 	// ruleData = ruleData2;
 	// jsonSK2 = jsonSK2mini;
@@ -341,6 +343,7 @@ function draw_tree(jsonData,treeIndex){
 for(var i =0; i<20; i++){
 	jsonSK2 = rfTrees[i];
 	//ruleData=ruleDatamini;
+	console.log(rfRules[i]);
 	ruleData=rfRules[i];
 	// *********get initializations*******************
 	var [root, nodes, links] = Initialize_tree(jsonSK2);
@@ -349,7 +352,7 @@ for(var i =0; i<20; i++){
 	draw_nodes(root,treeIndex, nodes);
 
 	//******** All about the links ******
-	draw_links(root,treeIndex, links);
+	// draw_links(root,treeIndex, links);
 	draw_nodes(root,treeIndex, nodes, emptyBox=1);
 	draw_nodes(root,treeIndex, nodes, emptyBox=2);
 	draw_nodes(root,treeIndex, nodes, emptyBox=3);
