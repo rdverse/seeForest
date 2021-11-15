@@ -60,6 +60,7 @@ var jsonSK2MiniEmpty = {'children': [{'feat': 2,
                 'val': 0.1}],
                 'feat': 2,
                 'left': 1,
+
                 'name': 'petal length (cm)',
                 'right': 2,
                 'val': 0.1};

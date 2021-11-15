@@ -2,8 +2,8 @@
 /////////////////////////global variables/////////////////////////////
 ////////////////////////////////////////////////////////////////////
 var margin = {top:30, right:60, left:60, bottom:30 },
-  			wdim = 960,
-			hdim =  1200,
+  			wdim = 1960,
+			hdim =  2200,
 			width = wdim - margin.right - margin.left,
 			height = hdim - margin.top - margin.bottom;
 var canvas;
