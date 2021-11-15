@@ -60,7 +60,7 @@ if(Number.isNaN(xmul)){
 }
   
 
-  function diagonals(p, c, dataSlice) {
+  function diagonals(c,p, dataSlice) {
 	// var temp = s;
 	// s = d;
 	// d=temp;
@@ -68,13 +68,17 @@ if(Number.isNaN(xmul)){
 	var parentName = p.data.name;	
 	var childName = c.data.name;
 	var childNameCopy = childName;
-
+	
 	if(childName=="leaf"){
 	childName = parentName;	
 	}
 	if(childName=="empty"){
-		childName = parentName;	
+		return null;
 		}
+	if(parentName=="empty"){
+		return null;
+		}
+		
 	var xmul;
 
 //	console.log(jsonData[childName][ruleIndex]);
@@ -85,8 +89,11 @@ if(Number.isNaN(xmul)){
 	// console.log(positionP);
 	// console.log(positionC);
 
-	xmulP = squareDim* dataSlice[childName] + squareDim*positionP;
-	xmulC = squareDim* dataSlice[childName] + squareDim*positionC;
+	var xmulP = squareDim* dataSlice[childName] + squareDim*positionP;
+	var xmulC = squareDim* dataSlice[childName] + squareDim*positionC;
+	// var	xmulP = 0;
+	// var	xmulC  =0;
+
 	//console.log(dataSlice[childName]);
 	// console.log("xmuls");
 	// console.log(xmulP);
@@ -97,10 +104,10 @@ if(Number.isNaN(xmul)){
 		xmul = squareDim+ squareDim*1;
 	}
 
-				path = `M ${p.x + xmulP}, ${p.y+squareDim}
-				C ${((p.x + c.x +20) / 2)} ${p.y+squareDim/2},
-				${((p.x + c.x +20) / 2)} ${c.y+squareDim/2},
-				${c.x+xmulC} , ${c.y}`
+				path = `M ${c.x + xmulC}, ${c.y}
+				C ${c.x +xmulC} ${(c.y+p.y + squareDim)/2},
+				${p.x+xmulP} ${(c.y+p.y + squareDim)/2},
+				${p.x+xmulP} , ${p.y+squareDim}`
 	
 				// path = `M ${s.y}, ${s.x+xmulC}
 				// C ${(s.y + d.y + squareDim) / 2} ${s.x+xmulC},
@@ -159,11 +166,11 @@ var nodes = treeData.descendants().reverse(),
 links = treeData.descendants().slice(1);
 
 //normalize depth
-nodes.forEach(d => {d.x = d.x +450;d.y = d.depth*150;});
+nodes.forEach(d => {d.x = d.x+300;d.y = d.depth*150;});
 
 // nodes.forEach(d => {d.x = d.x + squareDim*(positions[d.data.name]); console.log(positions[d.data.name]);});
 
-nodes.forEach(d => {d.x = d.x  -squareDim*(positions[d.data.name]);});
+// nodes.forEach(d => {d.x = d.x  +squareDim*(positions[d.data.name]);});
 
 
 // nodes.forEach(d => {d.x = d.x + positions[d.data.name]>2 ? -squareDim*(positions[d.data.name]);});
@@ -180,7 +187,7 @@ function add_text(nodeEnter){
 	.attr('x', function(d){return d.children || d._children ? 33 : 53;})
 	//.attr("y", function(d){return d.y;})
 	.attr("font-size", "12px")
-	.attr('fill', "black")
+	.attr('fill', function(d){return d['data']['name']!="empty"?"green":"white";})
 	.attr('text-anchor', function(d){
 		//console.log("d");
 		//console.log(d);
@@ -212,19 +219,23 @@ function draw_nodes(root,treeIndex, nodes, emptyBox=0){
 				console.log(d);
 				});
 
-	if(emptyBox==0){nodeEnter = add_text(nodeEnter);
-	}
+	// if(emptyBox==0){nodeEnter = add_text(nodeEnter);
+	// }
 	
 
 	var nodeUpdate = nodeEnter.merge(node);
 
-	if(emptyBox==0){
-		nodeUpdate.transition()
-		.duration(750)
-		.attr("transform", function(d) { 
-			
-			return "translate(" + (d.x+(squareDim*(positions[d.data.name]))) + "," + d.y+ ")";
+	if(emptyBox==-1){
+
+
+	}
 	
+	
+	else if(emptyBox==0){
+		nodeUpdate.transition()
+		.duration(50)
+		.attr("transform", function(d) { 
+			return "translate(" + (d.x+(squareDim*(positions[d.data.name]))) + "," + d.y+ ")";
 		});
 	
 		nodeUpdate.select('rect.node')
@@ -232,11 +243,12 @@ function draw_nodes(root,treeIndex, nodes, emptyBox=0){
 		.attr('height', squareDim)
 		.transition()
 		.delay((d,i) => i*100)
-		.attr('opacity', 0.2)
-		.attr("fill", "blue")
-		.style("stroke", "black");
-	
+		.attr('opacity', 0.05)
+		.attr("fill", function(d){return d['data']['name']=="empty"?"white":"black";})
+		.style("stroke",function(d){return d['data']['name']=="empty"?"white":"black";})
+		.style("stroke-width", function(d){return d['data']['name']=="empty"?"0":"1";});
 	}
+
 	else {
 		nodeUpdate.transition()
 		.duration(500)
@@ -247,18 +259,18 @@ function draw_nodes(root,treeIndex, nodes, emptyBox=0){
 		nodeUpdate.select('rect.node')
 		.attr('width', squareDim)
 		.attr('height', squareDim)
-		.attr('opacity', 0.2)
+		.attr('opacity', 0.05)
 		.attr("fill", "none")
 		.transition()
-		.delay((d,i) => i*100)
-		.style("stroke", function(d){return "black"});
+		.delay((d,i) => i*1)
+		.style("stroke", function(d){return "black"})
+		.style("stroke-width", function(d){return d['data']['name']=="empty"?"0":"1";});
 	}
 }
 
 function draw_links(root,treeIndex, links){
 	// console.log("links")
 	// console.log(links["0"]);
-
 	// console.log("data slice");
 	// console.log((jsonData)=> {return jsonData});
 
@@ -281,8 +293,13 @@ function draw_links(root,treeIndex, links){
 					.attr("class", "link")
 					.attr("stroke", colors[dataTarget[i]])
 					.attr("fill", "none")
-					.attr("opacity", 0.3)
-					.attr("stroke-width", "0.5px");
+					.attr("opacity", 0.1)
+					.attr("stroke-width", "0.5px")	.on("pointerover", function(p,d){
+					linkEnter.attr("opacity", 1);	
+					console.log(d);
+
+					});
+		
 
 		var linkUpdate = linkEnter.merge(link);
 
@@ -291,7 +308,7 @@ function draw_links(root,treeIndex, links){
 		
 		linkUpdate.transition()
 		 .delay((d,i) => i*100)
-		 .attr('d', function(d,rule){ return (ruleData[String(rule)][i]==1)?diagonals(d.parent,d,dataSlice):null;});
+		 .attr('d', function(d,rule){ return (ruleData[String(rule)][i]==1)?diagonals(d,d.parent,dataSlice):null;});
 	};
 	// var count = 0;
 	// // console.log(ruleData); 	
@@ -320,6 +337,11 @@ function draw_tree(jsonData,treeIndex){
 	// ruleData = ruleData2;
 	// jsonSK2 = jsonSK2mini;
 	// ruleData=ruleDatamini;
+
+for(var i =0; i<20; i++){
+	jsonSK2 = rfTrees[i];
+	//ruleData=ruleDatamini;
+	ruleData=rfRules[i];
 	// *********get initializations*******************
 	var [root, nodes, links] = Initialize_tree(jsonSK2);
 
@@ -333,6 +355,27 @@ function draw_tree(jsonData,treeIndex){
 	draw_nodes(root,treeIndex, nodes, emptyBox=3);
 	draw_nodes(root,treeIndex, nodes, emptyBox=4);
 	draw_nodes(root,treeIndex, nodes, emptyBox=5);
+
+}
+	
+
+
+	// jsonSK2 = jsonSK2MiniEmpty;
+	// //ruleData=ruleDatamini;
+	// ruleData=ruleDataMiniEmpty;
+	// // *********get initializations*******************
+	// var [root, nodes, links] = Initialize_tree(jsonSK2);
+
+	// //********nodes section ************
+	// draw_nodes(root,treeIndex, nodes);
+
+	// //******** All about the links ******
+	// draw_links(root,treeIndex, links);
+	// draw_nodes(root,treeIndex, nodes, emptyBox=1);
+	// draw_nodes(root,treeIndex, nodes, emptyBox=2);
+	// draw_nodes(root,treeIndex, nodes, emptyBox=3);
+	// draw_nodes(root,treeIndex, nodes, emptyBox=4);
+	// draw_nodes(root,treeIndex, nodes, emptyBox=5);
 
 
 

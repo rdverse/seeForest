@@ -53,10 +53,10 @@ def export_dict(clf, feature_names=None):
                 "right": tree.children_right[i],
             })
     
-    print(tree_nodes)
+    #print(tree_nodes)
     # Link tree nodes
     for node in tree_nodes:
-        print(node)
+        #print(node)
         if node["name"]!="leaf":
             node["children"] = list()
             node["children"].append(tree_nodes[node["right"]])
@@ -92,11 +92,14 @@ d = scale.fit_transform(data.data)
 # plt.show()
 js = export_dict(clf,feature_names= data.feature_names)
 
-pprint.pprint(js)
+#pprint.pprint(js)
+print(js)
 
-
-plot_tree(clf, filled=True,feature_names = data.feature_names, ax = ax)
+plot_tree(clf, filled=True,feature_names = data.feature_names, ax = ax,node_ids=True)
+plt.tight_layout()
+plt.savefig('dt.jpg')
 plt.show()
+
 # clf = DecisionTreeClassifier()
 # iris = load_iris()
 # clf = clf.fit(iris.data, iris.target)
@@ -109,7 +112,8 @@ plt.show()
 ruleMatrix = np.array(clf.tree_.decision_path(data.data.astype("float32")).todense()).astype("int")
 ruleJson = {}
 
-for i in range(1,5):
+
+for i in range(1,7):
     ruleJson[i-1] = ruleMatrix[:,i].flatten().tolist()
 
 dataJson = {}
