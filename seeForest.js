@@ -11,6 +11,7 @@ var squareDim = 20;
 var ss;
 var treeMap;
 var linksG = 0;
+var nodesG;
 /////////////////////////////////////////////////////////////////
 /////////////////////Function to draw lines for each link///////
 ///////////////////////////////////////////////////////////////
@@ -347,7 +348,7 @@ for(var i =0; i<20; i++){
 	ruleData=rfRules[i];
 	// *********get initializations*******************
 	var [root, nodes, links] = Initialize_tree(jsonSK2);
-
+	nodesG = nodes;
 	//********nodes section ************
 	draw_nodes(root,treeIndex, nodes);
 

@@ -139,6 +139,9 @@ def get_sub_slice(level=[], originalData={}, slice = {}, ruleSetState = []):
         return ruleSetState
 
 
+def update_rules(js, ruleJson):
+    print(ruleJson)
+    return ruleJson
 
 
 import itertools
@@ -199,6 +202,7 @@ for clf in rf.estimators_:
         jsData.writelines(jsonString)
         
     rfTrees.append(js)
+    updatedRules = update_rules(js, ruleJson)
     rfRules.append(ruleJson)
     
     
