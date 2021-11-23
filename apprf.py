@@ -17,6 +17,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 import pprint
 from sklearn.preprocessing import MinMaxScaler
+import json
 
 
 from sklearn.datasets import load_iris
@@ -139,6 +140,35 @@ def get_sub_slice(level=[], originalData={}, slice = {}, ruleSetState = []):
         return ruleSetState
 
 
+def update_rules_dfs(js, ruleJson):
+    
+    # add first row to rule list
+    stack = list()
+    rL = {}
+    newRulePoint = 0
+    ruleFetchPoint = 0
+
+    stack.append(js['children'][1])
+    stack.append(js['children'][0])
+
+    while stack:
+        d = stack.pop()
+        if d['name'] == 'empty':
+            rL[str(newRulePoint)] = list(np.zeros(150).astype(int))
+            newRulePoint +=1
+        else:  
+            rL[str(newRulePoint)] = ruleJson[ruleFetchPoint]
+            newRulePoint +=1
+            ruleFetchPoint +=1
+
+        if 'children' in d.keys():    
+            stack.append(d['children'][1])
+            stack.append(d['children'][0])
+
+    print(rL)
+    return rL
+
+
 def update_rules(js, ruleJson):
     
     # add first row to rule list
@@ -151,9 +181,10 @@ def update_rules(js, ruleJson):
     stack.append(js['children'][1])
 
     while stack:
-        d = stack.pop()
+        d = stack.pop(0)
+        print(d["name"])
         if d['name'] == 'empty':
-            rL[str(newRulePoint)] = np.zeros(150)
+            rL[str(newRulePoint)] = list(np.zeros(150).astype(int))
             newRulePoint +=1
         else:  
             rL[str(newRulePoint)] = ruleJson[ruleFetchPoint]
@@ -164,15 +195,21 @@ def update_rules(js, ruleJson):
             stack.append(d['children'][0])
             stack.append(d['children'][1])
 
-    print(rL)
+    # print(rL)
     return rL
+
+
+
+def print_len(r):
+    for key,val in r.items():
+        print(key, sum(val))
 
 
 import itertools
 data = load_iris()
 from sklearn.ensemble import RandomForestClassifier
 #clf = DecisionTreeClassifier(max_depth=2)
-depth = 3
+depth = 2
 rf = RandomForestClassifier(n_estimators =20, max_depth=depth, random_state = 14)
 rf.fit(data.data, data.target)
 
@@ -188,7 +225,7 @@ for clf in rf.estimators_:
     for i in range(1,depth+1):
         levels = np.array([ np.array(seq).astype(int) for seq in itertools.product("01", repeat=i)])
         #print(levels.shape)
-        print("#"*30)
+        # print("#"*30)
 
         for n,level in enumerate(levels):
             #print(n)
@@ -198,7 +235,7 @@ for clf in rf.estimators_:
 
 
 
-    print(js)
+    # print(js)
 
     ruleMatrix = np.array(clf.tree_.decision_path(data.data.astype("float32")).todense()).astype("int")
     rm = ruleMatrix
@@ -218,16 +255,15 @@ for clf in rf.estimators_:
     for i in range(1,ruleMatrix.shape[1]):
         ruleJson[i-1] = ruleMatrix[:,i].flatten().tolist()
         
-
-    import json
-
-    with open("ruleJson.json", "w") as jsData:
-        jsonString = json.dumps(ruleJson)
-        jsData.writelines(jsonString)
         
     rfTrees.append(js)
     updatedRules = update_rules(js, ruleJson)
     rfRules.append(updatedRules)
     
-for r in rfRules:
-    print(len(r))
+
+# with open("ruleJson.json", "w") as jsData:
+#     jsonString = json.dumps(ruleJson)
+#     jsData.writelines(jsonString)
+
+# for r in rfRules:
+#     print(len(r))

@@ -341,7 +341,7 @@ function draw_tree(jsonData,treeIndex){
 	// jsonSK2 = jsonSK2mini;
 	// ruleData=ruleDatamini;
 
-for(var i =0; i<20; i++){
+for(var i =0; i<2; i++){
 	jsonSK2 = rfTrees[i];
 	//ruleData=ruleDatamini;
 	console.log(rfRules[i]);
