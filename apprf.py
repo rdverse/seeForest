@@ -140,15 +140,39 @@ def get_sub_slice(level=[], originalData={}, slice = {}, ruleSetState = []):
 
 
 def update_rules(js, ruleJson):
-    print(ruleJson)
-    return ruleJson
+    
+    # add first row to rule list
+    stack = list()
+    rL = {}
+    newRulePoint = 0
+    ruleFetchPoint = 0
+
+    stack.append(js['children'][0])
+    stack.append(js['children'][1])
+
+    while stack:
+        d = stack.pop()
+        if d['name'] == 'empty':
+            rL[str(newRulePoint)] = np.zeros(150)
+            newRulePoint +=1
+        else:  
+            rL[str(newRulePoint)] = ruleJson[ruleFetchPoint]
+            newRulePoint +=1
+            ruleFetchPoint +=1
+
+        if 'children' in d.keys():    
+            stack.append(d['children'][0])
+            stack.append(d['children'][1])
+
+    print(rL)
+    return rL
 
 
 import itertools
 data = load_iris()
 from sklearn.ensemble import RandomForestClassifier
 #clf = DecisionTreeClassifier(max_depth=2)
-depth = 4
+depth = 3
 rf = RandomForestClassifier(n_estimators =20, max_depth=depth, random_state = 14)
 rf.fit(data.data, data.target)
 
@@ -203,6 +227,7 @@ for clf in rf.estimators_:
         
     rfTrees.append(js)
     updatedRules = update_rules(js, ruleJson)
-    rfRules.append(ruleJson)
+    rfRules.append(updatedRules)
     
-    
+for r in rfRules:
+    print(len(r))

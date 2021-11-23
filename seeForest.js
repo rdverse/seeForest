@@ -353,7 +353,7 @@ for(var i =0; i<20; i++){
 	draw_nodes(root,treeIndex, nodes);
 
 	//******** All about the links ******
-	// draw_links(root,treeIndex, links);
+	draw_links(root,treeIndex, links);
 	draw_nodes(root,treeIndex, nodes, emptyBox=1);
 	draw_nodes(root,treeIndex, nodes, emptyBox=2);
 	draw_nodes(root,treeIndex, nodes, emptyBox=3);
