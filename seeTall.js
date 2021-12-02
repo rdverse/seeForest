@@ -15,56 +15,8 @@ var nodesG;
 /////////////////////////////////////////////////////////////////
 /////////////////////Function to draw lines for each link///////
 ///////////////////////////////////////////////////////////////
-function diagonal(s, d,i) {
-//	s.y = s.y+squareDim;
-	//d.x=d.x+squareDim;
-	//d.x = d.x-10;
-    //d.x = d.x+10
-	//s.x = s.x+10
-	// path = `M ${s.y} ${s.x+10}
-    //         C ${(s.y + d.y) / 2} ${s.x+10},
-    //           ${(s.y + d.y) / 2} ${d.x+10},
-    //           ${d.y} ${d.x+10}`
-	// console.log("s");
-	// console.log(ss);
-
-// 	for(var key in s.data){
-// 	console.log(s.data[key]);
-// 	console.log(s.data["val"]);
-// }
-//console.log(ruleData[i]);
-
-//console.log("parent: " + d["data"]["name"] + "   child :" +  s["data"]["name"] )
-
-for(rule in ruleData[i]){
-}
-var xmul;
-	try{
-		// console.log("try");
-		xmul = squareDim*s.data["val"];// + squareDim*(s.data["feat"]);
-	}
-	catch{
-		// console.log("catch");
-		xmul = squareDim;
-	}
-
-if(Number.isNaN(xmul)){
-	xmul = squareDim;//+ squareDim*(s.data["feat"]-1);
-}
-
-	path = `M ${s.y}, ${s.x+xmul}
-			C ${(s.y + d.y) / 2} ${s.x+xmul},
-            ${(s.y + d.y) / 2} ${d.x+xmul},
-			${d.y+squareDim} , ${d.x+xmul}`
-
-    return path
-}
-  
 
   function diagonals(c,p, dataSlice) {
-	// var temp = s;
-	// s = d;
-	// d=temp;
 
 	var parentName = p.data.name;	
 	var childName = c.data.name;
@@ -82,45 +34,20 @@ if(Number.isNaN(xmul)){
 		
 	var xmul;
 
-//	console.log(jsonData[childName][ruleIndex]);
 	positionP = positions[parentName];
-	positionC = positions[childNameCopy];
-	
-	// console.log("postiions");
-	// console.log(positionP);
-	// console.log(positionC);
+	positionC = positions[childNameCopy];	
 
 	var xmulP = squareDim* dataSlice[childName] + squareDim*positionP;
 	var xmulC = squareDim* dataSlice[childName] + squareDim*positionC;
-	// var	xmulP = 0;
-	// var	xmulC  =0;
 
-	//console.log(dataSlice[childName]);
-	// console.log("xmuls");
-	// console.log(xmulP);
-	// console.log(xmulC);
-	// console.log(xmul);
 	
 	if(Number.isNaN(xmul)){
 		xmul = squareDim+ squareDim*1;
 	}
-
-				path = `M ${c.x + xmulC}, ${c.y}
-				C ${c.x +xmulC} ${(c.y+p.y + squareDim)/2},
-				${p.x+xmulP} ${(c.y+p.y + squareDim)/2},
-				${p.x+xmulP} , ${p.y+squareDim}`
-	
-				// path = `M ${s.y}, ${s.x+xmulC}
-				// C ${(s.y + d.y + squareDim) / 2} ${s.x+xmulC},
-				// ${(s.y + d.y + squareDim) / 2} ${d.x+ xmulP},
-				// ${d.y+squareDim} , ${d.x+xmulP}`
-	
-
-					// return "M" + d.source.y + "," + d.source.x
-					// 	+ "C" + (d.source.y + d.target.y) / 2 + "," + d.source.x
-					// 	+ " " + (d.source.y + d.target.y) / 2 + "," + d.target.x
-					// 	+ " " + d.target.y + "," + d.target.x;
-
+				path = `M ${xmulC}, ${c.y}
+				C ${xmulC} ${(c.y+p.y + squareDim)/2},
+				${xmulP} ${(c.y+p.y + squareDim)/2},
+				${xmulP} , ${p.y+squareDim}`
 		return path
 }
 	
@@ -173,7 +100,6 @@ nodes.forEach(d => {d.x = d.x+300;d.y = d.depth*150;});
 
 // nodes.forEach(d => {d.x = d.x  +squareDim*(positions[d.data.name]);});
 
-
 // nodes.forEach(d => {d.x = d.x + positions[d.data.name]>2 ? -squareDim*(positions[d.data.name]);});
 linksG = links;
 return [root, nodes, links];
@@ -220,9 +146,9 @@ function draw_nodes(root,treeIndex, nodes, emptyBox=0){
 				console.log(d);
 				});
 
-	// if(emptyBox==0){
-	// 	nodeEnter = add_text(nodeEnter);
-	// }
+	if(emptyBox==0){
+		nodeEnter = add_text(nodeEnter);
+	}
 	
 
 	var nodeUpdate = nodeEnter.merge(node);
@@ -237,7 +163,7 @@ function draw_nodes(root,treeIndex, nodes, emptyBox=0){
 		nodeUpdate.transition()
 		.duration(50)
 		.attr("transform", function(d) { 
-			return "translate(" + (d.x+  squareDim*(positions[d.data.name])) + "," + d.y+ ")";
+			return "translate(" + (  squareDim*(positions[d.data.name])) + "," + d.y+ ")";
 		});
 	
 		nodeUpdate.select('rect.node')
@@ -255,7 +181,7 @@ function draw_nodes(root,treeIndex, nodes, emptyBox=0){
 		nodeUpdate.transition()
 		.duration(500)
 		.attr("transform", function(d) { 
-			return "translate(" + (d.x + ( squareDim *emptyBox)) + "," + d.y+ ")";
+			return "translate(" + ( + ( squareDim *emptyBox)) + "," + d.y+ ")";
 		});
 	
 		nodeUpdate.select('rect.node')
@@ -341,7 +267,7 @@ function draw_tree(jsonData,treeIndex){
 	// jsonSK2 = jsonSK2mini;
 	// ruleData=ruleDatamini;
 
-for(var i =0; i<20; i++){
+for(var i =1; i<2; i++){
 	jsonSK2 = rfTrees[i];
 	//ruleData=ruleDatamini;
 	console.log(rfRules[i]);

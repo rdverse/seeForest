@@ -12,118 +12,7 @@ var ss;
 var treeMap;
 var linksG = 0;
 var nodesG;
-/////////////////////////////////////////////////////////////////
-/////////////////////Function to draw lines for each link///////
-///////////////////////////////////////////////////////////////
-function diagonal(s, d,i) {
-//	s.y = s.y+squareDim;
-	//d.x=d.x+squareDim;
-	//d.x = d.x-10;
-    //d.x = d.x+10
-	//s.x = s.x+10
-	// path = `M ${s.y} ${s.x+10}
-    //         C ${(s.y + d.y) / 2} ${s.x+10},
-    //           ${(s.y + d.y) / 2} ${d.x+10},
-    //           ${d.y} ${d.x+10}`
-	// console.log("s");
-	// console.log(ss);
 
-// 	for(var key in s.data){
-// 	console.log(s.data[key]);
-// 	console.log(s.data["val"]);
-// }
-//console.log(ruleData[i]);
-
-//console.log("parent: " + d["data"]["name"] + "   child :" +  s["data"]["name"] )
-
-for(rule in ruleData[i]){
-}
-var xmul;
-	try{
-		// console.log("try");
-		xmul = squareDim*s.data["val"];// + squareDim*(s.data["feat"]);
-	}
-	catch{
-		// console.log("catch");
-		xmul = squareDim;
-	}
-
-if(Number.isNaN(xmul)){
-	xmul = squareDim;//+ squareDim*(s.data["feat"]-1);
-}
-
-	path = `M ${s.y}, ${s.x+xmul}
-			C ${(s.y + d.y) / 2} ${s.x+xmul},
-            ${(s.y + d.y) / 2} ${d.x+xmul},
-			${d.y+squareDim} , ${d.x+xmul}`
-
-    return path
-}
-  
-
-  function diagonals(c,p, dataSlice) {
-	// var temp = s;
-	// s = d;
-	// d=temp;
-
-	var parentName = p.data.name;	
-	var childName = c.data.name;
-	var childNameCopy = childName;
-	
-	if(childName=="leaf"){
-	childName = parentName;	
-	}
-	if(childName=="empty"){
-		return null;
-		}
-	if(parentName=="empty"){
-		return null;
-		}
-		
-	var xmul;
-
-//	console.log(jsonData[childName][ruleIndex]);
-	positionP = positions[parentName];
-	positionC = positions[childNameCopy];
-	
-	// console.log("postiions");
-	// console.log(positionP);
-	// console.log(positionC);
-
-	var xmulP = squareDim* dataSlice[childName] + squareDim*positionP;
-	var xmulC = squareDim* dataSlice[childName] + squareDim*positionC;
-	// var	xmulP = 0;
-	// var	xmulC  =0;
-
-	//console.log(dataSlice[childName]);
-	// console.log("xmuls");
-	// console.log(xmulP);
-	// console.log(xmulC);
-	// console.log(xmul);
-	
-	if(Number.isNaN(xmul)){
-		xmul = squareDim+ squareDim*1;
-	}
-
-				path = `M ${c.x + xmulC}, ${c.y}
-				C ${c.x +xmulC} ${(c.y+p.y + squareDim)/2},
-				${p.x+xmulP} ${(c.y+p.y + squareDim)/2},
-				${p.x+xmulP} , ${p.y+squareDim}`
-	
-				// path = `M ${s.y}, ${s.x+xmulC}
-				// C ${(s.y + d.y + squareDim) / 2} ${s.x+xmulC},
-				// ${(s.y + d.y + squareDim) / 2} ${d.x+ xmulP},
-				// ${d.y+squareDim} , ${d.x+xmulP}`
-	
-
-					// return "M" + d.source.y + "," + d.source.x
-					// 	+ "C" + (d.source.y + d.target.y) / 2 + "," + d.source.x
-					// 	+ " " + (d.source.y + d.target.y) / 2 + "," + d.target.x
-					// 	+ " " + d.target.y + "," + d.target.x;
-
-		return path
-}
-	
 /////////////////////////////////////////////////////////////////
 /////////////////////Function to build svg//////////////////////
 ///////////////////////////////////////////////////////////////
@@ -167,7 +56,16 @@ var nodes = treeData.descendants().reverse(),
 links = treeData.descendants().slice(1);
 
 //normalize depth
-nodes.forEach(d => {d.x = d.x+300;d.y = d.depth*150;});
+nodes.forEach(d => {d.x = d.x+width/2; d.y = d.depth*30;});
+
+// nodes.forEach(d => { 
+// if(d.x>root.x0){
+// 	d.x = root.x0;
+// }
+// else{
+// 	d.x = root.x0 - positions[d.data.name]*;
+// }	
+// });
 
 // nodes.forEach(d => {d.x = d.x + squareDim*(positions[d.data.name]); console.log(positions[d.data.name]);});
 
@@ -215,10 +113,20 @@ function draw_nodes(root,treeIndex, nodes, emptyBox=0){
 	nodeEnter.append("rect")
 			.attr('class', 'node')
 			.attr('width', squareDim)
-			.attr('height', squareDim)
-			.on("pointerover", function(p,d){
-				console.log(d);
-				});
+			.attr('height', squareDim);
+			// .on("pointerover", function(p,d){
+			// 	console.log(d);
+			// 	// d.attr('width',20)
+			// 	d3.select(this)
+			// 	.attr('width',40)
+			// 	.attr('height',40);
+			// }).on("pointerout", function(p,d){
+			// 	console.log(d);
+			// 	// d.attr('width',20)
+			// 	d3.select(this)
+			// 	.attr('width',10)
+			// 	.attr('height',10);
+			// });
 
 	// if(emptyBox==0){
 	// 	nodeEnter = add_text(nodeEnter);
@@ -237,12 +145,12 @@ function draw_nodes(root,treeIndex, nodes, emptyBox=0){
 		nodeUpdate.transition()
 		.duration(50)
 		.attr("transform", function(d) { 
-			return "translate(" + (d.x+  squareDim*(positions[d.data.name])) + "," + d.y+ ")";
+			return "translate(" + (d.x+( (squareDim/(d.depth+1) )*(positions[d.data.name]))) + "," + d.y+ ")";
 		});
 	
 		nodeUpdate.select('rect.node')
-		.attr('width', function(d){return squareDim})
-		.attr('height', function(d){return squareDim})
+		.attr('width', function(d){return squareDim/(d.depth+1)})
+		.attr('height', function(d){return squareDim/(d.depth+1)})
 		.transition()
 		.delay((d,i) => i*1)
 		.attr('opacity', 0.05)
@@ -255,12 +163,12 @@ function draw_nodes(root,treeIndex, nodes, emptyBox=0){
 		nodeUpdate.transition()
 		.duration(500)
 		.attr("transform", function(d) { 
-			return "translate(" + (d.x + ( squareDim *emptyBox)) + "," + d.y+ ")";
+			return "translate(" + (d.x + ( squareDim/(d.depth+1) *emptyBox)) + "," + d.y+ ")";
 		});
 	
 		nodeUpdate.select('rect.node')
-		.attr('width', function(d){return squareDim})
-		.attr('height', function(d){return squareDim})
+		.attr('width', function(d){return squareDim/(d.depth+1)})
+		.attr('height', function(d){return squareDim/(d.depth+1)})
 		.attr('opacity', 0.05)
 		.attr("fill", "none")
 		.transition()
@@ -270,77 +178,14 @@ function draw_nodes(root,treeIndex, nodes, emptyBox=0){
 	}
 }
 
-function draw_links(root,treeIndex, links){
-	// console.log("links")
-	// console.log(links["0"]);
-	// console.log("data slice");
-	// console.log((jsonData)=> {return jsonData});
-
-	colors = {0:"red", 1: "blue", 2:"green"}
-
-	for(var i = 0; i<150;i++){	
-
-		var dataSlice = {};
-	
-		for(key in jsonData){
-			dataSlice[key] = jsonData[key][i];
-		};
-
-		// console.log(i);
-		var link = canvas.selectAll('path.link' + String(treeIndex) + "_" + String(i))
-					.data(links, function(d){return d.id;});
-		
-		var linkEnter = link.enter()
-					.insert('path', "g")
-					.attr("class", "link")
-					.attr("stroke", colors[dataTarget[i]])
-					.attr("fill", "none")
-					.attr("opacity", 0.1)
-					.attr("stroke-width", "0.5px")	.on("pointerover", function(p,d){
-					linkEnter.attr("opacity", 1);	
-					console.log(d);
-
-					});
-		
-
-		var linkUpdate = linkEnter.merge(link);
-
-		// linkUpdate.attr('d', function(d,rule){ return (console.log(ruleData[rule][i], rule))});
-		// linkUpdate.attr('d', function(d,rule){ return (ruleData[rule][i]==1)?console.log("some"):console.log("none");});
-		
-
-		console.log(ruleData);
-		linkUpdate.transition()
-		 .delay((d,i) => i*100)
-		 .attr('d', function(d,rule){ console.log(rule);return (ruleData[String(rule)][i]==1)?diagonals(d,d.parent,dataSlice):null;});
-	};
-	// var count = 0;
-	// // console.log(ruleData); 	
-	// 	//console.log(ruleData["0"][rule]);
-	// 	// console.log(rule);
-
-	// 	if(ruleData["3"][rule]==1){
-	// 	}
-	// 	count+=1;
-	
-// for each data point
-	// rule 0 
-	// rule 1
-	// rule 2
-	// rule 3
-	// .. 
-	// ..
-}
 
 function draw_tree(jsonData,treeIndex){
 	set_tree_map();
-
 	//jsonSK2= jsonSK2empty;
 	// jsonSK2= jsonSK22;
 	// ruleData = ruleData2;
 	// jsonSK2 = jsonSK2mini;
 	// ruleData=ruleDatamini;
-
 for(var i =0; i<20; i++){
 	jsonSK2 = rfTrees[i];
 	//ruleData=ruleDatamini;
@@ -353,13 +198,11 @@ for(var i =0; i<20; i++){
 	draw_nodes(root,treeIndex, nodes);
 
 	//******** All about the links ******
-	draw_links(root,treeIndex, links);
 	draw_nodes(root,treeIndex, nodes, emptyBox=1);
 	draw_nodes(root,treeIndex, nodes, emptyBox=2);
 	draw_nodes(root,treeIndex, nodes, emptyBox=3);
 	draw_nodes(root,treeIndex, nodes, emptyBox=4);
 	draw_nodes(root,treeIndex, nodes, emptyBox=5);
-
 }
 	
 

@@ -1,15 +1,4 @@
-# from flask import Flask
 
-# app = Flask(__name__)
-
-# @app.route("/6900")
-# def hello():
-#     return "Hello World"
-
-# if __name__=='__main__':
-#     app.run()
-
-# import sklearn_json as skljson
 from sklearn.datasets import load_iris
 from sklearn.tree import DecisionTreeClassifier, export_text
 import tempfile
@@ -18,6 +7,8 @@ import numpy as np
 import pprint
 from sklearn.preprocessing import MinMaxScaler
 import json
+from sklearn.ensemble import RandomForestClassifier
+
 
 
 from sklearn.datasets import load_iris
@@ -140,130 +131,59 @@ def get_sub_slice(level=[], originalData={}, slice = {}, ruleSetState = []):
         return ruleSetState
 
 
-def update_rules_dfs(js, ruleJson):
-    
-    # add first row to rule list
-    stack = list()
-    rL = {}
-    newRulePoint = 0
-    ruleFetchPoint = 0
-
-    stack.append(js['children'][1])
-    stack.append(js['children'][0])
-
-    while stack:
-        d = stack.pop()
-        if d['name'] == 'empty':
-            rL[str(newRulePoint)] = list(np.zeros(150).astype(int))
-            newRulePoint +=1
-        else:  
-            rL[str(newRulePoint)] = ruleJson[ruleFetchPoint]
-            newRulePoint +=1
-            ruleFetchPoint +=1
-
-        if 'children' in d.keys():    
-            stack.append(d['children'][1])
-            stack.append(d['children'][0])
-
-    print(rL)
-    return rL
-
-
-def update_rules(js, ruleJson):
-    
-    # add first row to rule list
-    stack = list()
-    rL = {}
-    newRulePoint = 0
-    ruleFetchPoint = 0
-
-    stack.append(js['children'][0])
-    stack.append(js['children'][1])
-
-    while stack:
-        d = stack.pop(0)
-        print(d["name"])
-        if d['name'] == 'empty':
-            rL[str(newRulePoint)] = list(np.zeros(150).astype(int))
-            newRulePoint +=1
-        else:  
-            rL[str(newRulePoint)] = ruleJson[ruleFetchPoint]
-            newRulePoint +=1
-            ruleFetchPoint +=1
-
-        if 'children' in d.keys():    
-            stack.append(d['children'][0])
-            stack.append(d['children'][1])
-
-    # print(rL)
-    return rL
-
-
-
 def print_len(r):
     for key,val in r.items():
         print(key, sum(val))
 
 
+def get_dataPath(clf,data):
+
+    node_indicator = clf.decision_path(data.data)
+    sampleDecisions = []
+    for sample_id in range(len(data.data)):
+        # obtain ids of the nodes `sample_id` goes through, i.e., row `sample_id`
+        # sample_id = 51
+        node_index = node_indicator.indices[
+            node_indicator.indptr[sample_id] : node_indicator.indptr[sample_id + 1]
+        ]
+
+        decisions = [l if l>=0 else 4 for l in clf.tree_.feature[node_index]]
+
+        crunchDecisions = []
+        
+        for dl in range(len(decisions)):
+            if dl==len(decisions)-1:
+                break
+            else:
+                crunchDecisions.append([decisions[dl], decisions[dl+1]])
+        
+        sampleDecisions.append(crunchDecisions)
+        
+    return sampleDecisions
+
 import itertools
 data = load_iris()
-from sklearn.ensemble import RandomForestClassifier
 #clf = DecisionTreeClassifier(max_depth=2)
 depth = 5
-rf = RandomForestClassifier(n_estimators = 2, max_depth=depth, random_state = 14)
+rf = RandomForestClassifier(n_estimators = 10, max_depth=depth, random_state = 14)
 rf.fit(data.data, data.target)
 
 
 
 rfTrees = []
 rfRules = []
+rfPaths = []
 
 for clf in rf.estimators_: 
     js = export_dict(clf,feature_names= data.feature_names)
-    
-    # ruleSetState = []
-
-    # for i in range(1,depth+1):
-    #     levels = np.array([ np.array(seq).astype(int) for seq in itertools.product("01", repeat=i)])
-    #     #print(levels.shape)
-    #     # print("#"*30)
-
-    #     for n,level in enumerate(levels):
-    #         #print(n)
-    #         level=list(level)
-    #         get_sub_slice(level=level, originalData=js, slice={}, ruleSetState=ruleSetState)
-
-
-
-
-    # print(js)
 
     ruleMatrix = np.array(clf.tree_.decision_path(data.data.astype("float32")).todense()).astype("int")
     rm = ruleMatrix
-    # if js["children"][0]["children"][0]["name"]=="empty":
-    #     print("Adding zeros at 2 and 3")
-    #     ruleMatrix = np.insert(ruleMatrix, 5, np.zeros(150),axis=1)
-    #     ruleMatrix = np.insert(ruleMatrix, 6, np.zeros(150),axis=1)
-        
-    # if js["children"][1]["children"][0]["name"]=="empty":
-    #     print("Adding zeros at 4 and 5")
-
-    #     ruleMatrix = np.insert(ruleMatrix, 3, np.zeros(150),axis=1)
-    #     ruleMatrix = np.insert(ruleMatrix, 4, np.zeros(150),axis=1)
 
     ruleJson = {}
     for i in range(1,ruleMatrix.shape[1]):
         ruleJson[i-1] = ruleMatrix[:,i].flatten().tolist()
         
     rfTrees.append(js)
-    # updatedRules = update_rules(js, ruleJson)
-    # rfRules.append(updatedRules)
     rfRules.append(ruleJson)
-
-
-# with open("ruleJson.json", "w") as jsData:
-    # jsonString = json.dumps(rfRules)
-    # jsData.writelines(jsonString)
-
-# for r in rfRules:
-#     print(len(r))
+    rfPaths.append(get_dataPath(clf, data.data))
