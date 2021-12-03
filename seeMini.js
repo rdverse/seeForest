@@ -237,12 +237,12 @@ function draw_nodes(root,treeIndex, nodes, emptyBox=0){
 		nodeUpdate.transition()
 		.duration(50)
 		.attr("transform", function(d) { 
-			return "translate(" + (d.x+  squareDim*(positions[d.data.name])) + "," + d.y+ ")";
+			return "translate(" + (d.x+( (squareDim/(d.depth+1) )*(positions[d.data.name]))) + "," + d.y+ ")";
 		});
 	
 		nodeUpdate.select('rect.node')
-		.attr('width', function(d){return squareDim})
-		.attr('height', function(d){return squareDim})
+		.attr('width', function(d){return squareDim/(d.depth+1)})
+		.attr('height', function(d){return squareDim/(d.depth+1)})
 		.transition()
 		.delay((d,i) => i*1)
 		.attr('opacity', 0.05)
@@ -255,12 +255,12 @@ function draw_nodes(root,treeIndex, nodes, emptyBox=0){
 		nodeUpdate.transition()
 		.duration(500)
 		.attr("transform", function(d) { 
-			return "translate(" + (d.x + ( squareDim *emptyBox)) + "," + d.y+ ")";
+			return "translate(" + (d.x + ( squareDim/(d.depth+1) *emptyBox)) + "," + d.y+ ")";
 		});
 	
 		nodeUpdate.select('rect.node')
-		.attr('width', function(d){return squareDim})
-		.attr('height', function(d){return squareDim})
+		.attr('width', function(d){return squareDim/(d.depth+1)})
+		.attr('height', function(d){return squareDim/(d.depth+1)})
 		.attr('opacity', 0.05)
 		.attr("fill", "none")
 		.transition()
