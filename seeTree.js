@@ -56,7 +56,7 @@ var nodes = treeData.descendants().reverse(),
 links = treeData.descendants().slice(1);
 
 //normalize depth
-nodes.forEach(d => {d.x = d.x+width/2; d.y = d.depth*30;});
+nodes.forEach(d => {d.x = d.x+width/2; d.y = d.depth*90;});
 
 // nodes.forEach(d => { 
 // if(d.x>root.x0){

@@ -146,9 +146,9 @@ function draw_nodes(root,treeIndex, nodes, emptyBox=0){
 				console.log(d);
 				});
 
-	if(emptyBox==0){
-		nodeEnter = add_text(nodeEnter);
-	}
+	// if(emptyBox==0){
+	// 	nodeEnter = add_text(nodeEnter);
+	// }
 	
 
 	var nodeUpdate = nodeEnter.merge(node);
@@ -267,7 +267,7 @@ function draw_tree(jsonData,treeIndex){
 	// jsonSK2 = jsonSK2mini;
 	// ruleData=ruleDatamini;
 
-for(var i =1; i<2; i++){
+for(var i =1; i<10; i++){
 	jsonSK2 = rfTrees[i];
 	//ruleData=ruleDatamini;
 	console.log(rfRules[i]);
