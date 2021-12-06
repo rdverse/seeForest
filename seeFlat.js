@@ -84,10 +84,6 @@ function build_canvas(){
 	return svg;
 }  
 
-/////////////////////////////////////////////////////////////////
-/////////////////////tooltip for node//////////////////////
-///////////////////////////////////////////////////////////////
-
 ////////////////////////////////////////////////////////
 ////////////////////////////FLATS////////////////////////
 //////////////////////////////////////////////////////////
@@ -157,8 +153,20 @@ function add_flat_text(){
 	.text(function(d){return d});
 }
 
-function draw_flat_nodes(root=[], treeIndex=[], nodes=[], emptyBox=0){
-	
+
+function get_pointer_data(d){
+if(Object.keys(d).includes("explicitOriginalTarget"))
+{
+	return d.explicitOriginalTarget.__data__;
+}
+else{
+	// console.log(d.srcElement.__data__);
+	return(d.srcElement.__data__);
+}
+}
+
+
+function draw_flat_nodes(root=[], treeIndex=[], nodes=[], emptyBox=0){	
 	nodes = [1,2,3,4,5];
 	var i = 0;
 	count = {};
@@ -188,11 +196,13 @@ function draw_flat_nodes(root=[], treeIndex=[], nodes=[], emptyBox=0){
 			.style("stroke-width", function(d){return "0";})
 			.on("click",function(d){
 			if(globalSelect==-1){
-				globalSelect = d.explicitOriginalTarget.__data__;
+				console.log(d);
+				globalSelect = get_pointer_data(d);
 			}
 			else{
 				var temp = 'a';
-				var curSelect = d.explicitOriginalTarget.__data__;
+				console.log(d);
+				var curSelect = get_pointer_data(d);
 				// swap Revpositions
 					temp = positionsRev[curSelect];
 					positionsRev[curSelect] = positionsRev[globalSelect];
@@ -219,10 +229,8 @@ function draw_flat_nodes(root=[], treeIndex=[], nodes=[], emptyBox=0){
 	// d3.selectAll(".square")
 	// 	.attr("fill", "red")
 	// 	.style("stroke", function(d){return "black"});
-		
 	// add_flat_text();
 	}
-
 
 function draw_flat_links(root,treeIndex, links){
 	
@@ -277,12 +285,11 @@ if(treeSel[i]=="true"){
 	
 }	
 }
-
-
 //////////////////////////////////////////////
 ///////////////select functions//////////////
 ////////////////////////////////////////////
 function tree_select(){
+	console.log("in tree select fn");
 	var svg  = d3.select("#treeSelect")
 	.append("svg")
 	.attr("width", 500)
@@ -298,45 +305,48 @@ function tree_select(){
 		.style("text-decoration", "underline")
 		.style('fill', '#black')
 		.text("Select Trees");
-	nodes =  Object.keys(treeSel);
 
+	nodes =  Object.keys(treeSel);
 	var nodeDraw = svg.selectAll("nodes")
 					.data(nodes, function(d,i){return d;})
 					.enter()
 					.append("g")
 					.attr('class', 'node');
-	nodeDraw.selectAll("square")
+
+	nodeDraw.selectAll("treeSquare")
 			.data(nodes, function(d,i){return d;})
 			.enter().append("rect")
-			.attr("class","treeSelect")
+			.attr("class","treeSquare")
 			.attr('width', function(d) { return 20; })
 			.attr('height', function(d) { return 20; })	
 			.attr('x', function(d){return (d*2*20)})
-			.attr('y', function(d) { return 350; })
-			.attr('opacity', 0.25)
+			.attr('y', function(d) { return 150; })
 			.attr("fill", "black")
 			.style("stroke", function(d){return "black"})
 			.style("stroke-width", function(d){return "0";})
+			.attr('opacity', 0.25)
 			.on("mouseover", function(d){
-
+					console.log("tree mouse over");
+					console.log(this);
 			if(this["attributes"]["width"].value==20){
 				d3.select(this)
 				.attr('width', 30)
 				.attr('height', 30)
 				.attr("opacity", 1.0);
-				treeSel[d.explicitOriginalTarget.__data__]="true";
+				console.log(d);
+				treeSel[get_pointer_data(d)]="true";
 			}
 			else{
 				d3.select(this)
 				.attr('width', 20)
 				.attr('height', 20)
 				.attr("opacity", 1.0);
-				treeSel[d.explicitOriginalTarget.__data__]="false";
+				console.log(d);
+
+				treeSel[get_pointer_data(d)]="false";
 			}
 			});
-
 		}
-
 
 function data_select(){
 	var svg  = d3.select("#dataSelect")
@@ -375,24 +385,26 @@ function data_select(){
 			.style("stroke", function(d){return "black"})
 			.style("stroke-width", function(d){return "0";})
 			.on("mouseover", function(d){
-
 			if(this["attributes"]["width"].value==10){
 				d3.select(this)
 				.attr('width', 15)
 				.attr('height', 45)
 				.attr("opacity", 1.0);
-				dataSel[d.explicitOriginalTarget.__data__]="true";
+				console.log(d);
+
+				dataSel[get_pointer_data(d)]="true";
 			}
 			else{
 				d3.select(this)
 				.attr('width', 10)
 				.attr('height', 10)
 				.attr("opacity", 1.0);
-				dataSel[d.explicitOriginalTarget.__data__]="false";
+				console.log(d);
+
+				dataSel[get_pointer_data(d)]="false";
 			}
 			});
 }
-
 
 ////////////////////////////////////////////////////////////////////
 /////////////////////// MAIN //////////////////////////////////////
