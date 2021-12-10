@@ -87,9 +87,9 @@ function build_canvas(){
 ////////////////////////////////////////////////////////
 ////////////////////////////FLATS////////////////////////
 //////////////////////////////////////////////////////////
-function diagonals_flat(d, deep, dataSlice) {
+function diagonals_flat(d, deep, dataSlice, treeIndex) {
 	// console.log(d);
-
+	console.log(d);
 	var dch = [];
 	// var keyIndices = Object.keys(positions);
 	// // console.log(keyIndices);
@@ -105,30 +105,60 @@ function diagonals_flat(d, deep, dataSlice) {
 	positionC = dch[1];	
 	positionP = dch[0];
 
+	var bendornot="bend";
+
+	// what to do if parent is leaf
 	if(parentName!="leaf"){
+		// to have same position as previous feature value
+		//var xmulP = squareDim*1* dataSlice[parentName] + squareDim*1.1*positionP;
+		// to have the relative treeIndex value, n_trees=10
 		var xmulP = squareDim*1* dataSlice[parentName] + squareDim*1.1*positionP;
 	}
 	else{
-		// console.log("parent is leaf");
+		console.log("Something terribly wor==rong!!!!!!");
+		console.log("parent is leaf");
 		parentName = childName;
 		var xmulP = squareDim*1* dataSlice[parentName] + squareDim*1.1*positionP;
 	}
 
+	// what to do if child is leaf
 	if(childName!="leaf"){
 
 		//console.log(childName);
 		var xmulC = squareDim*1* dataSlice[childName] + squareDim*1.1*positionC;
 	}
 	else{
+		bendornot = 'dontbend';
 		// console.log("child is leaf");
 		childName=parentName;
-		var xmulC = squareDim*1* dataSlice[childName] + squareDim*1.1*positionC;
+		var xmulC = squareDim*1* treeIndex/10 + squareDim*1.1*positionC;
+	}
+
+	// bend the line right or left a bit
+	var bend = 0;
+	if(bendornot=='bend'){
+		console.log();
+		if(d[0]>d[1]){
+			bend = -(xmulC+xmulP)/8;
+		}
+		else{
+			bend = +(xmulC+xmulP)/8;
+		}
+	
 	}
 	
+				// path = `M ${xmulC}, ${350}
+				// C ${xmulC} ${350-deep*squareDim},
+				// ${xmulP} ${350- deep*squareDim},
+				// ${xmulP} , ${350}`
+if(xmulC==xmulP){bend=0;}
+bend=0;
 				path = `M ${xmulC}, ${350}
-				C ${xmulC} ${(350+350)/2- deep*squareDim},
-				${xmulP} ${(350+350)/2- deep*squareDim},
-				${xmulP} , ${350}`
+				L ${(((xmulC+xmulP)/2) + bend)}, ${350-(deep+1)* (squareDim/2)},
+				L ${xmulP}, ${350}`
+
+				
+	console.log(path);
 	return path
 }
 
@@ -196,12 +226,12 @@ function draw_flat_nodes(root=[], treeIndex=[], nodes=[], emptyBox=0){
 			.style("stroke-width", function(d){return "0";})
 			.on("click",function(d){
 			if(globalSelect==-1){
-				console.log(d);
+				// console.log(d);
 				globalSelect = get_pointer_data(d);
 			}
 			else{
 				var temp = 'a';
-				console.log(d);
+				// console.log(d);
 				var curSelect = get_pointer_data(d);
 				// swap Revpositions
 					temp = positionsRev[curSelect];
@@ -261,10 +291,10 @@ function draw_flat_links(root,treeIndex, links){
 		.attr("fill", "none")
 		.attr("opacity", op)
 		.attr("stroke-width", "1px")
-		.attr("d", function(d,i){return diagonals_flat(d,i,dataSlice)})
+		.attr("d", function(d,i){return diagonals_flat(d,i,dataSlice, treeIndex)})
 		.on("pointerover", function(p,d){
 			linkDraw.attr("opacity", 1);	
-			console.log(d);
+			// console.log(d);
 			});			
 		
 		// linkDraw.attr("d", function(d,i){return diagonals_flat(d,i,dataSlice)})
@@ -274,9 +304,7 @@ function draw_flat_links(root,treeIndex, links){
 
 function draw_tree(jsonData,treeIndex){
 	canvas = build_canvas();
-
 	// set_tree_map();
-	
 for(var i =0; i<10; i++){
 if(treeSel[i]=="true"){
 	draw_flat_nodes('root',i, 'nodes');
@@ -289,7 +317,7 @@ if(treeSel[i]=="true"){
 ///////////////select functions//////////////
 ////////////////////////////////////////////
 function tree_select(){
-	console.log("in tree select fn");
+	// console.log("in tree select fn");
 	var svg  = d3.select("#treeSelect")
 	.append("svg")
 	.attr("width", 500)
@@ -326,14 +354,14 @@ function tree_select(){
 			.style("stroke-width", function(d){return "0";})
 			.attr('opacity', 0.25)
 			.on("mouseover", function(d){
-					console.log("tree mouse over");
-					console.log(this);
+					// console.log("tree mouse over");
+					// console.log(this);
 			if(this["attributes"]["width"].value==20){
 				d3.select(this)
 				.attr('width', 30)
 				.attr('height', 30)
 				.attr("opacity", 1.0);
-				console.log(d);
+				// console.log(d);
 				treeSel[get_pointer_data(d)]="true";
 			}
 			else{
@@ -341,7 +369,7 @@ function tree_select(){
 				.attr('width', 20)
 				.attr('height', 20)
 				.attr("opacity", 1.0);
-				console.log(d);
+				// console.log(d);
 
 				treeSel[get_pointer_data(d)]="false";
 			}
@@ -390,7 +418,7 @@ function data_select(){
 				.attr('width', 15)
 				.attr('height', 45)
 				.attr("opacity", 1.0);
-				console.log(d);
+				// console.log(d);
 
 				dataSel[get_pointer_data(d)]="true";
 			}
@@ -399,7 +427,7 @@ function data_select(){
 				.attr('width', 10)
 				.attr('height', 10)
 				.attr("opacity", 1.0);
-				console.log(d);
+				// console.log(d);
 
 				dataSel[get_pointer_data(d)]="false";
 			}
@@ -413,8 +441,12 @@ function main(){
 	d3.selectAll("svg").remove();
 	tree_select();
 	data_select();
-	// Radial tree seems to be a cool idea
 	draw_tree(jsonSK2);
-	
-}
+	for(var i = 0; i<150;i++){
+		dataSel[i] = "false";
+	}
+	for(var i = 0; i<10;i++){
+		treeSel[i] = "false";
+	}
 
+}
